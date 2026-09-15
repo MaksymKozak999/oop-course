@@ -1,0 +1,69 @@
+namespace ClinicApp;
+
+internal class Patient
+{
+    private static int _nextId = 1;
+
+    public int Id { get; }
+    public string FirstName { get; set; } = "Невідомий";
+    public string LastName { get; set; } = "Пацієнт";
+    public DateTime DateOfBirth { get; set; }
+    public string BloodType { get; set; } = "Невідомо";
+    public string Phone { get; set; } = "0000000000";
+    public string Email { get; set; } = string.Empty;
+
+    public string FullName => $"{FirstName} {LastName}";
+
+    public int Age
+    {
+        get
+        {
+            var today = DateTime.Today;
+            var age = today.Year - DateOfBirth.Year;
+            if (DateOfBirth.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
+    }
+
+    public bool IsAdult => Age >= 18;
+
+    public Patient()
+        : this("Невідомий", "Пацієнт", DateTime.Today.AddYears(-26), "Невідомо", "0000000000") { }
+
+
+    public Patient(string firstName, string lastName)
+        : this(firstName, lastName, DateTime.Today.AddYears(-26), "Невідомо", "0000000000") { }
+
+
+    public Patient(string firstName, string lastName, DateTime dateOfBirth, string bloodType, string phone, string email = "")
+    {
+        Id = _nextId++;
+        FirstName = firstName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        BloodType = bloodType;
+        Phone = phone;
+        Email = email;
+    }
+
+    public string GetAgeCategory()
+    {
+        if (Age < 18)
+        {
+            return "дитина";
+        }
+        if (Age < 60)
+        {
+            return "дорослий";
+        }
+        return "літній";
+    }
+
+    public override string ToString()
+    {
+        return $"[{Id}] {FullName} | Вік: {Age} ({GetAgeCategory()}) | Кров: {BloodType} | Тел: {Phone}";
+    }
+}
