@@ -10,7 +10,7 @@ public static class Task1
         int n = int.Parse(Console.ReadLine()!);
 
         double[] weight = new double[n];
-        for (int i = 0; i < n - 1 ;i++)
+        for (int i = 0; i < n;i++)
         {
             Console.WriteLine($"Enter weight of patient {i+1}: ");
             weight[i] = double.Parse(Console.ReadLine()!);
@@ -18,8 +18,8 @@ public static class Task1
 
         double max = weight[0];
         double min = weight[0];
-
         double sum = 0;
+
         foreach (double w in weight)
         {
             sum += w;
@@ -35,11 +35,14 @@ public static class Task1
 
         }
         double avg = sum / weight.Length;
-        double moreThanAvg = 0;
-        foreach (double w in weight)
+        int moreThanAvg = 0;
+
+        for (int i = 0; i < n; i++)
         {
-            if (w > avg)
+            if (weight[i] > avg)
+            {
                 moreThanAvg++;
+            }
         }
 
         Console.WriteLine($"Count fo patints:{n}");
