@@ -1,74 +1,88 @@
 using System;
 
-public static class Task3
+public static class Task8
 {
     public static void Run()
     {
         Console.WriteLine("-- Task 8 --");
-       
+
+        double weight = double.Parse(Console.ReadLine()!);
+        double height = double.Parse(Console.ReadLine()!);
+
+        double price = double.Parse(Console.ReadLine()!);
+        int visits = int.Parse(Console.ReadLine()!);
+        int discount = int.Parse(Console.ReadLine()!);
+
+        int birthYear = int.Parse(Console.ReadLine()!);
+
+        int systolic = int.Parse(Console.ReadLine()!);
+        int diastolic = int.Parse(Console.ReadLine()!);
+
+        double bmi = CalculateBMI(weight, height);
+        Console.WriteLine($"BMI: {bmi:F2} -> {GetBMICategory(bmi)}");
+
+        double cost = CalculateCost(price, visits, discount);
+        Console.WriteLine($"Cost: {cost:F2} UAH");
+
+        int age = 2026 - birthYear;
+        Console.WriteLine($"Age: {age} years, category: {GetAgeCategory(age)}");
+
+        Console.WriteLine(GetPressureStatus(systolic, diastolic));
     }
+
     static double CalculateBMI(double weight, double height)
     {
-        double bmi = weight / (height * height);
-
-        return bmi;
+        return weight / (height * height);
     }
+
     static string GetBMICategory(double bmi)
     {
-        if (bmi <= 18.4)
+        if (bmi < 18.5)
         {
             return "Underweight";
         }
-        else if (bmi >= 18.5 && bmi <= 24.99)
+        else if (bmi < 25)
         {
-            return "Congratulations! Ideal Weight!";
+            return "Normal";
         }
-        else if (bmi >= 25.0 && bmi <= 29.99)
+        else if (bmi < 30)
         {
             return "Overweight";
         }
-        else if (bmi >= 30.0 && bmi <= 34.99)
-        {
-            return "Class I Obesity";
-        }
-        else if (bmi >= 35.0 && bmi <= 39.99)
-        {
-            return "Class II Obesity";
-        }
         else
         {
-            return "Class III Obesity";
+            return "Obesity";
         }
     }
-    static double CalculateCost(double price, double quantity, double discount)
-    {
-        double sum = price * quantity * (1 - discount / 100);
 
-        return sum;
+    static double CalculateCost(double price, int visits, int discount)
+    {
+        return price * visits * (1 - discount / 100.0);
     }
+
     static string GetAgeCategory(int age)
     {
         if (age <= 17)
         {
-            return $"Child";
+            return "Child";
         }
         else if (age <= 59)
         {
-            return $"Adult";
+            return "Adult";
         }
         else
         {
-            return $"Pensioner";
+            return "Pensioner";
         }
-
     }
+
     static string GetPressureStatus(int systolic, int diastolic)
     {
         string category;
 
         if (systolic < 120 && diastolic < 80)
         {
-            category = "normal";
+            category = "Normal";
         }
         else if (systolic < 130 && diastolic < 80)
         {
@@ -76,11 +90,11 @@ public static class Task3
         }
         else if (systolic < 140 || diastolic < 90)
         {
-            category = "hypertension 1 stage";
+            category = "Hypertension stage 1";
         }
         else
         {
-            category = "hypertension 2 stage";
+            category = "Hypertension stage 2";
         }
 
         return $"Blood pressure: {systolic}/{diastolic} — {category}";
