@@ -9,17 +9,17 @@ public static class Task2
 
         int n = int.Parse(Console.ReadLine()!);
 
-        double[] costs = new double[n];
+        int[] costs = new int[n];
 
         for (int i = 0; i < n; i++)
         {
             Console.WriteLine($"Enter cost of visit {i + 1}:");
-            costs[i] = double.Parse(Console.ReadLine()!);
+            costs[i] = int.Parse(Console.ReadLine()!);
         }
 
         string originalCosts = string.Join(" | ", costs);
 
-        double[] costsSorted = (double[])costs.Clone();
+        int[] costsSorted = (int[])costs.Clone();
 
         for (int i = 0; i < n - 1; i++)
         {
@@ -27,7 +27,7 @@ public static class Task2
             {
                 if (costsSorted[j] > costsSorted[j + 1])
                 {
-                    double temp = costsSorted[j];
+                    int temp = costsSorted[j];
                     costsSorted[j] = costsSorted[j + 1];
                     costsSorted[j + 1] = temp;
                 }
