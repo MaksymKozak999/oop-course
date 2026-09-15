@@ -29,21 +29,6 @@ static public class Task8
                 }
             }
         }
-        
-        for (int i = 0; i < data.GetLength(0); i++)
-        {
-            int currentSum = 0;
-
-            for (int j = 0; j < data.GetLength(1); j++)
-            {
-                for (int k = 0; k < data.GetLength(2); k++)
-                {
-                    currentSum += data[i, j, k];
-                }
-            }
-
-            totals[i] = currentSum;
-        }
 
         for (int i = 0; i < data.GetLength(0); i++)
         {
@@ -67,7 +52,7 @@ static public class Task8
                     }
                     
                 }
-                Console.WriteLine($"Total for week: {weeklySum}");
+                Console.WriteLine($"Total for week: {weeklysum}");
                 Console.WriteLine();
             }
 
