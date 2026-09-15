@@ -33,7 +33,7 @@ public static class Task5
             sideDiagonalSum += matrix[i, n - 1 - i]; 
         }
         Console.WriteLine($"Main diagonal: {string.Join(", ", mainDiagonal)}(summ = {mainDiagonalSum})");
-        Console.WriteLine($"Side diagonal: {string.Join(", ", sideDiagonal)}(summ = {mainDiagonalSum})");
+        Console.WriteLine($"Side diagonal: {string.Join(", ", sideDiagonal)}(summ = {sideDiagonalSum})");
 
     }
 }
