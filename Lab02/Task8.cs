@@ -51,10 +51,12 @@ static public class Task8
 
             for (int j = 0; j < data.GetLength(1); j++)
             {
+                int weeklysum = 0;
                 Console.WriteLine($"-- Week {j + 1}:");
 
                 for (int k = 0; k < data.GetLength(2); k++)
                 {
+                    weeklysum += data[i, j, k];
                     if (k == 0)
                     {
                         Console.Write($"Morning: {data[i, j, k]}\t");
@@ -63,8 +65,9 @@ static public class Task8
                     {
                         Console.Write($"Evening: {data[i, j, k]}\t");
                     }
+                    
                 }
-
+                Console.WriteLine($"Total for week: {weeklySum}");
                 Console.WriteLine();
             }
 
