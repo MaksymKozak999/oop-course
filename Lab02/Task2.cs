@@ -17,10 +17,11 @@ public static class Task2
             costs[i] = int.Parse(Console.ReadLine()!);
         }
 
-        string originalCosts = string.Join(" | ", costs);
+        string originalCosts = string.Join(" ", costs);
 
         int[] costsSorted = (int[])costs.Clone();
 
+        // Bubble sort
         for (int i = 0; i < n - 1; i++)
         {
             for (int j = 0; j < n - 1 - i; j++)
@@ -34,12 +35,12 @@ public static class Task2
             }
         }
 
-        string sortedCosts = string.Join(" | ", costsSorted);
+        string sortedCosts = string.Join(" ", costsSorted);
 
-        Console.WriteLine($"Unsorted costs: {originalCosts}");
-        Console.WriteLine($"Sorted costs: {sortedCosts}");
+        Console.WriteLine($"Queue before: {originalCosts}");
+        Console.WriteLine($"Queue after: {sortedCosts}");
 
-        Console.WriteLine($"The cheapest: {costsSorted[0]} UAH");
-        Console.WriteLine($"The most expensive: {costsSorted[n - 1]} UAH");
+        Console.WriteLine($"Cheapest: {costsSorted[0]} UAH");
+        Console.WriteLine($"Most expensive: {costsSorted[n - 1]} UAH");
     }
 }
