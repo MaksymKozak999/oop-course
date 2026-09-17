@@ -41,7 +41,14 @@ internal class Doctor
     }
     public override string ToString()
     {
-        string status = IsAvailableNow ? "доступний зараз" : "не в робочий час";
-        return $"[{Id}] {FullName} | {Speciality} | {LicenseNumber} | Тел: {Phone} | {WorkSchedule} ({WorkingHoursPerDay} год) | {status}";
+        string status;
+        if (IsAvailableNow)
+            status = "доступний зараз";
+        else
+            status = "не в робочий час";
+
+        return $"[{Id}] {FullName} | {Speciality} | {LicenseNumber} | " +
+               $"Тел: {Phone} | {WorkSchedule} " +
+               $"({WorkingHoursPerDay} год) | {status}";
     }
 }
