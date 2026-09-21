@@ -4,13 +4,13 @@ internal class Doctor
 {
     private static int _nextId = 1;
     public int Id { get; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Speciality { get; set; }
-    public string LicenseNumber { get; set; }
-    public string Phone { get; set; }
-    public int WorkStartHour { get; set; }
-    public int WorkEndHour { get; set; }
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public string Speciality { get; private set; }
+    public string LicenseNumber { get; private set; }
+    public string Phone { get; private set; }
+    public int WorkStartHour { get; private set; }
+    public int WorkEndHour { get; private set; }
 
     public string FullName => $"{FirstName} {LastName}";
 
