@@ -168,7 +168,7 @@ internal class AppointmentManager
         Console.WriteLine(
             $"[{appointment.Id}] {patientName} → {doctorName} | " +
             $"{appointment.ScheduledAt:dd.MM.yyyy HH:mm}-" +
-            $"{appointment.EndAt:HH:mm} | " +
+            $"{appointment.EndsAt:HH:mm} | " +
             $"{appointment.Status}");
     }
 
