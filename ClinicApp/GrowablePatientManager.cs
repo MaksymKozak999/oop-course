@@ -19,20 +19,7 @@ internal class GrowablePatientManager
     {
         if (_count == Capacity)
         {
-            Patient[] newPatients =
-                new Patient[_patients.Length * 2];
-
-            for (int i = 0; i < _patients.Length; i++)
-            {
-                newPatients[i] = _patients[i];
-            }
-
-            _patients = newPatients;
-
-            Console.WriteLine(
-                $"Масив заповнений! Розширення: " +
-                $"{_patients.Length / 2} → {_patients.Length}"
-            );
+            Grow();
         }
 
         _patients[_count] = patient;
@@ -44,6 +31,26 @@ internal class GrowablePatientManager
         );
     }
 
+    private void Grow()
+    {
+        int oldCapacity = _patients.Length;
+        int newCapacity = oldCapacity * 2;
+
+        Patient[] newPatients =
+            new Patient[newCapacity];
+
+        for (int i = 0; i < _patients.Length; i++)
+        {
+            newPatients[i] = _patients[i];
+        }
+
+        _patients = newPatients;
+
+        Console.WriteLine(
+            $"Масив заповнений! Розширення: " +
+            $"{oldCapacity} → {newCapacity}"
+        );
+    }
     public Patient? FindById(int id)
     {
         for (int i = 0; i < _count; i++)
