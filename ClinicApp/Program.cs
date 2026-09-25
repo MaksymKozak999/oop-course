@@ -7,6 +7,35 @@ class Program
     {
         Clinic clinic = new Clinic("Медична Клініка");
 
+        Doctor doctor1 = new Doctor(
+            "Іван",
+            "Петренко",
+            "Кардіолог",
+            "LIC-001",
+            "0501111111");
+
+        Doctor doctor2 = new Doctor(
+            "Олександр",
+            "Шевченко",
+            "Хірург",
+            "LIC-002",
+            "0502222222");
+
+        Doctor doctor3 = new Doctor(
+            "Андрій",
+            "Мельник",
+            "Терапевт",
+            "LIC-003",
+            "0503333333");
+
+        clinic.Doctors.Add(doctor1);
+        clinic.Doctors.Add(doctor2);
+        clinic.Doctors.Add(doctor3);
+
+        Console.WriteLine(doctor1);
+        Console.WriteLine(doctor2);
+        Console.WriteLine(doctor3);
+
         bool exit = false;
 
         while (!exit)

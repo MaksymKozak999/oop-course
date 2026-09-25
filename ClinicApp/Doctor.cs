@@ -9,8 +9,8 @@ internal class Doctor
     public string Speciality { get; private set; }
     public string LicenseNumber { get; private set; }
     public string Phone { get; private set; }
-    public int WorkStartHour { get; private set; }
-    public int WorkEndHour { get; private set; }
+    public int WorkStartHour { get; }
+    public int WorkEndHour { get; }
 
     public string FullName => $"{FirstName} {LastName}";
 
@@ -23,7 +23,7 @@ internal class Doctor
 
     public Doctor(string firstName, string lastName, string speciality) : this(firstName, lastName, speciality, "LIC-000", "0000000000"){ }
 
-    public Doctor(string firstName, string lastName, string speciality, string licenseNumber, string phone, int workStartHour = 8, int workEndHour = 17)
+    public Doctor(string firstName,string lastName,string speciality,string licenseNumber,string phone)
     {
         Id = _nextId++;
         FirstName = firstName;
@@ -31,8 +31,8 @@ internal class Doctor
         Speciality = speciality;
         LicenseNumber = licenseNumber;
         Phone = phone;
-        WorkStartHour = workStartHour;
-        WorkEndHour = workEndHour;
+        WorkStartHour = 8;
+        WorkEndHour = 17;
     }
 
     public bool CanAcceptAt(int hour)
