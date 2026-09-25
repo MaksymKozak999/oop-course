@@ -2,17 +2,22 @@ namespace ClinicApp;
 
 internal class Clinic
 {
-    public string Name;
-    public PatientManager Patients;
-    public DoctorManager Doctors;
-    public AppointmentManager Appointments;
+    private string _name;
+    private PatientManager _patients;
+    private DoctorManager _doctors;
+    private AppointmentManager _appointments;
+
+    public string Name => _name;
+    public PatientManager Patients => _patients;
+    public DoctorManager Doctors => _doctors;
+    public AppointmentManager Appointments => _appointments;
 
     public Clinic(string name)
     {
-        Name = name;
-        Patients = new PatientManager();
-        Doctors = new DoctorManager();
-        Appointments = new AppointmentManager(Patients, Doctors);
+        _name = name;
+        _patients = new PatientManager();
+        _doctors = new DoctorManager();
+        _appointments = new AppointmentManager(_patients, _doctors);
     }
 
     public void DisplaySchedule(DateTime date)
