@@ -1,4 +1,5 @@
 using System;
+
 namespace ClinicApp;
 
 internal class PatientManager
@@ -8,6 +9,19 @@ internal class PatientManager
     private int _count;
 
     public int Count => _count;
+
+    public Patient? this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= _count)
+            {
+                return null;
+            }
+
+            return _patients[index];
+        }
+    }
 
     public void Add(Patient patient)
     {
@@ -20,7 +34,6 @@ internal class PatientManager
         _patients[_count] = patient;
         _count++;
         Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FirstName} {patient.LastName} додано.");
-
     }
 
     public Patient? FindById(int id)
@@ -35,6 +48,19 @@ internal class PatientManager
         return null;
     }
 
+    public bool TryFindById(int id, out Patient patient)
+    {
+        Patient? found = FindById(id);
+        if (found != null)
+        {
+            patient = found;
+            return true;
+        }
+
+        patient = null!;
+        return false;
+    }
+
     public Patient[] FindByName(string name)
     {
         if (name == null || name.Trim() == "")
@@ -43,7 +69,6 @@ internal class PatientManager
         }
 
         string query = name.Trim().ToLower();
-
         int matchCount = 0;
 
         for (int i = 0; i < _count; i++)
@@ -58,7 +83,6 @@ internal class PatientManager
         }
 
         Patient[] result = new Patient[matchCount];
-
         int index = 0;
 
         for (int i = 0; i < _count; i++)
@@ -67,6 +91,33 @@ internal class PatientManager
             string lastName = _patients[i].LastName.ToLower();
 
             if (firstName.Contains(query) || lastName.Contains(query))
+            {
+                result[index] = _patients[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    public Patient[] FindByBloodType(BloodType bloodType)
+    {
+        int matchCount = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodType == bloodType)
+            {
+                matchCount++;
+            }
+        }
+
+        Patient[] result = new Patient[matchCount];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_patients[i].BloodType == bloodType)
             {
                 result[index] = _patients[i];
                 index++;
@@ -103,6 +154,7 @@ internal class PatientManager
         _count--;
         return true;
     }
+
     public void DisplayAll()
     {
         if (_count == 0)
@@ -119,6 +171,7 @@ internal class PatientManager
             Console.WriteLine($"[{p.Id}] {p.FirstName} {p.LastName} | Вік: {p.Age} ({status}) | кров: {p.BloodType} | Тел: {p.Phone}");
         }
     }
+
     public void DisplayStats()
     {
         if (_count == 0)

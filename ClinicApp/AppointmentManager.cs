@@ -1,3 +1,5 @@
+using System;
+
 namespace ClinicApp;
 
 internal class AppointmentManager
@@ -11,14 +13,27 @@ internal class AppointmentManager
 
     public int Count => _count;
 
-    public AppointmentManager(PatientManager patients,DoctorManager doctors)
+    public Appointment? this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= _count)
+            {
+                return null;
+            }
+
+            return _appointments[index];
+        }
+    }
+
+    public AppointmentManager(PatientManager patients, DoctorManager doctors)
     {
         _patients = patients;
         _doctors = doctors;
         _appointments = new Appointment[MaxAppointments];
     }
 
-    public bool Book(int patientId,int doctorId,DateTime scheduledAt,int durationMinutes = 30)
+    public bool Book(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
     {
         if (_count >= MaxAppointments)
             return false;
@@ -35,7 +50,7 @@ internal class AppointmentManager
             return false;
         }
 
-        Appointment appointment = new Appointment(patientId,doctorId,scheduledAt,durationMinutes);
+        Appointment appointment = new Appointment(patientId, doctorId, scheduledAt, durationMinutes);
 
         _appointments[_count] = appointment;
         _count++;
@@ -78,7 +93,6 @@ internal class AppointmentManager
         }
 
         Array.Resize(ref result, resultCount);
-
         return result;
     }
 
@@ -97,7 +111,6 @@ internal class AppointmentManager
         }
 
         Array.Resize(ref result, resultCount);
-
         return result;
     }
 
@@ -116,8 +129,12 @@ internal class AppointmentManager
         }
 
         Array.Resize(ref result, resultCount);
-
         return result;
+    }
+
+    public Appointment[] GetByDate(int year, int month, int day)
+    {
+        return GetByDate(new DateTime(year, month, day));
     }
 
     public Appointment[] GetUpcoming()
@@ -135,7 +152,6 @@ internal class AppointmentManager
         }
 
         Array.Resize(ref result, resultCount);
-
         return result;
     }
 
@@ -144,26 +160,8 @@ internal class AppointmentManager
         Patient? patient = _patients.FindById(appointment.PatientId);
         Doctor? doctor = _doctors.FindById(appointment.DoctorId);
 
-        string patientName;
-        string doctorName;
-
-        if (patient != null)
-        {
-            patientName = patient.FullName;
-        }
-        else
-        {
-            patientName = $"Пацієнт #{appointment.PatientId}";
-        }
-
-        if (doctor != null)
-        {
-            doctorName = doctor.FullName;
-        }
-        else
-        {
-            doctorName = $"Лікар #{appointment.DoctorId}";
-        }
+        string patientName = patient != null ? patient.FullName : $"Пацієнт #{appointment.PatientId}";
+        string doctorName = doctor != null ? doctor.FullName : $"Лікар #{appointment.DoctorId}";
 
         Console.WriteLine(
             $"[{appointment.Id}] {patientName} → {doctorName} | " +
