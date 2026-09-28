@@ -1,4 +1,5 @@
 using System;
+
 namespace ClinicApp;
 
 internal class DoctorManager
@@ -8,6 +9,19 @@ internal class DoctorManager
     private int _count;
 
     public int Count => _count;
+
+    public Doctor? this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= _count)
+            {
+                return null;
+            }
+
+            return _doctors[index];
+        }
+    }
 
     public void Add(Doctor doctor)
     {
@@ -20,7 +34,6 @@ internal class DoctorManager
         _doctors[_count] = doctor;
         _count++;
         Console.WriteLine($"Доктора [{doctor.Id}] {doctor.FirstName} {doctor.LastName} додано.");
-
     }
 
     public Doctor? FindById(int id)
@@ -35,6 +48,19 @@ internal class DoctorManager
         return null;
     }
 
+    public bool TryFindById(int id, out Doctor doctor)
+    {
+        Doctor? found = FindById(id);
+        if (found != null)
+        {
+            doctor = found;
+            return true;
+        }
+
+        doctor = null!;
+        return false;
+    }
+
     public Doctor[] FindBySpeciality(string speciality)
     {
         if (speciality == null || speciality.Trim() == "")
@@ -43,13 +69,12 @@ internal class DoctorManager
         }
 
         string query = speciality.Trim().ToLower();
-
         int matchCount = 0;
 
         for (int i = 0; i < _count; i++)
         {
-            string s = _doctors[i].Speciality.ToLower();
-            
+            string s = _doctors[i].Speciality.ToString().ToLower();
+
             if (s.Contains(query))
             {
                 matchCount++;
@@ -57,14 +82,40 @@ internal class DoctorManager
         }
 
         Doctor[] result = new Doctor[matchCount];
-
         int index = 0;
 
         for (int i = 0; i < _count; i++)
         {
-            string s = _doctors[i].Speciality.ToLower();
+            string s = _doctors[i].Speciality.ToString().ToLower();
 
             if (s.Contains(query))
+            {
+                result[index] = _doctors[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    public Doctor[] FindBySpeciality(Speciality speciality)
+    {
+        int matchCount = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_doctors[i].Speciality == speciality)
+            {
+                matchCount++;
+            }
+        }
+
+        Doctor[] result = new Doctor[matchCount];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_doctors[i].Speciality == speciality)
             {
                 result[index] = _doctors[i];
                 index++;
@@ -101,15 +152,14 @@ internal class DoctorManager
         _count--;
         return true;
     }
-   
+
     public Doctor[] GetAll()
     {
         Doctor[] result = new Doctor[_count];
-
         Array.Copy(_doctors, result, _count);
-
         return result;
     }
+
     public void DisplayAll()
     {
         if (_count == 0)
@@ -125,7 +175,6 @@ internal class DoctorManager
             Doctor d = _doctors[i];
 
             string status;
-
             if (d.IsAvailableNow)
                 status = "доступний зараз";
             else
@@ -140,6 +189,7 @@ internal class DoctorManager
             );
         }
     }
+
     public void DisplayStats()
     {
         if (_count == 0)
@@ -191,9 +241,7 @@ internal class DoctorManager
                 }
             }
 
-            Console.WriteLine(
-                $"    {_doctors[i].Speciality}: {specialityCount}"
-            );
+            Console.WriteLine($"    {_doctors[i].Speciality}: {specialityCount}");
         }
 
         Console.WriteLine("==========================");

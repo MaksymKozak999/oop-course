@@ -10,11 +10,11 @@ internal class Appointment
     public int DoctorId { get; }
     public DateTime ScheduledAt { get; set; }
     public int DurationMinutes { get; set; }
-    public string Status {  get; private set; }
+    public AppointmentStatus Status {  get; private set; }
     public string Notes {  get; private set; }
 
     public DateTime EndsAt => ScheduledAt.AddMinutes(DurationMinutes);
-    public bool IsUpcoming => ScheduledAt > DateTime.Now && Status == "Scheduled";
+    public bool IsUpcoming => ScheduledAt > DateTime.Now && Status == AppointmentStatus.Scheduled;
 
     public Appointment(int patientId,int doctorId,DateTime scheduledAt,int durationMinutes = 30)
     {
@@ -23,14 +23,14 @@ internal class Appointment
         this.DoctorId = doctorId;
         this.ScheduledAt = scheduledAt;
         this.DurationMinutes = durationMinutes;
-        this.Status = "Scheduled";
+        this.Status = AppointmentStatus.Scheduled;
         this.Notes = "";
     }
     public bool Cancel(string reason = "")
     {
-        if (Status == "Scheduled")
+        if (Status == AppointmentStatus.Scheduled)
         {
-            Status = "Cancelled";
+            Status = AppointmentStatus.Cancelled;
 
             if (reason != null && reason.Trim() != "")
                 Notes = reason;
@@ -44,9 +44,9 @@ internal class Appointment
 
     public bool Complete()
     {
-        if (Status == "Scheduled")
+        if (Status == AppointmentStatus.Scheduled)
         {
-            Status = "Completed";
+            Status = AppointmentStatus.Completed;
             return true;
         }
         else

@@ -1,5 +1,7 @@
 namespace ClinicApp;
 
+using static BloodType;
+
 internal class Patient
 {
     private static int _nextId = 1;
@@ -8,7 +10,7 @@ internal class Patient
     public string FirstName { get; private set; } = "Невідомий";
     public string LastName { get; private set; } = "Пацієнт";
     public DateTime DateOfBirth { get; private set; }
-    public string BloodType { get; private set; } = "Невідомо";
+    public BloodType BloodType { get; private set; } = BloodType.Unknown;
     public string Phone { get; private set; } = "0000000000";
     public string Email { get; private set; } = string.Empty;
 
@@ -30,13 +32,13 @@ internal class Patient
 
     public bool IsAdult => Age >= 18;
 
-    public Patient(): this("Невідомий", "Пацієнт", DateTime.Today.AddYears(-26), "Невідомо", "0000000000") { }
+    public Patient(): this("Невідомий", "Пацієнт", DateTime.Today.AddYears(-26), BloodType.Unknown, "0000000000",string.Empty) { }
 
 
-    public Patient(string firstName, string lastName): this(firstName, lastName, DateTime.Today, "Невідомо", "0000000000") { }
+    public Patient(string firstName, string lastName): this(firstName, lastName, DateTime.Today, BloodType.Unknown, "0000000000", string.Empty) { }
 
 
-    public Patient(string firstName, string lastName, DateTime dateOfBirth, string bloodType, string phone, string email = "")
+    public Patient(string firstName, string lastName, DateTime dateOfBirth, BloodType bloodType, string phone, string email = "")
     {
         this.Id = _nextId++;
         this.FirstName = firstName;
@@ -62,6 +64,6 @@ internal class Patient
 
     public override string ToString()
     {
-        return $"[{Id}] {FullName} | Вік: {Age} ({GetAgeCategory()}) | Кров: {BloodType} | Тел: {Phone}";
+        return $"[{Id}] {FullName} | Вік: {ClinicFormatter.FormatAge(Age)} ({GetAgeCategory()}) | Кров: {ClinicFormatter.FormatBloodType(BloodType)} | Тел: {ClinicFormatter.FormatPhone(Phone)}";
     }
 }
