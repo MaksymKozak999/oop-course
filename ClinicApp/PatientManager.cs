@@ -10,13 +10,13 @@ internal class PatientManager
 
     public int Count => _count;
 
-    public Patient? this[int index]
+    public Patient this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
             {
-                return null;
+                throw new IndexOutOfRangeException("Індекс виходить за межі масиву пацієнтів.");
             }
 
             return _patients[index];
@@ -50,15 +50,8 @@ internal class PatientManager
 
     public bool TryFindById(int id, out Patient patient)
     {
-        Patient? found = FindById(id);
-        if (found != null)
-        {
-            patient = found;
-            return true;
-        }
-
-        patient = null!;
-        return false;
+        patient = FindById(id);
+        return patient != null;
     }
 
     public Patient[] FindByName(string name)
