@@ -38,6 +38,10 @@ internal class Doctor
         : this(firstName, lastName, licenseNumber, phone, new WorkSchedule(8, 17), speciality)
     {
     }
+    public bool CanAcceptAt(int hour)
+    {
+        return Schedule.Contains(hour);
+    }
 
     public override string ToString()
     {
