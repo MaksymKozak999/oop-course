@@ -330,10 +330,10 @@ class Program
                     Doctor doctor = new Doctor(
                         firstName,
                         lastName,
-                        speciality,
-                        licenseNumber,
-                        phone,
-                        schedule
+                        licenseNumber,  
+                        phone,          
+                        schedule,      
+                        speciality      
                     );
 
                     clinic.Doctors.Add(doctor);

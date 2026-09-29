@@ -23,7 +23,7 @@ internal class Doctor
     public int WorkEndHour => Schedule.End;
     public int WorkingHoursPerDay => Schedule.HoursPerDay;
 
-    public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone, WorkSchedule schedule)
+    public Doctor(string firstName, string lastName, string licenseNumber, string phone, WorkSchedule schedule, Speciality speciality = Speciality.General)
     {
         Id = _nextId++;
         FirstName = firstName;
@@ -35,7 +35,7 @@ internal class Doctor
     }
 
     public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
-        : this(firstName, lastName, speciality, licenseNumber, phone, new WorkSchedule(8, 17))
+        : this(firstName, lastName, licenseNumber, phone, new WorkSchedule(8, 17), speciality)
     {
     }
 
