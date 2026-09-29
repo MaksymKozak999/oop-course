@@ -95,17 +95,17 @@ internal class PatientManager
 
     public Patient[] FindByBloodType(BloodType bloodType)
     {
-        int matchCount = 0;
+        int count = 0;
 
         for (int i = 0; i < _count; i++)
         {
             if (_patients[i].BloodType == bloodType)
             {
-                matchCount++;
+                count++;
             }
         }
 
-        Patient[] result = new Patient[matchCount];
+        Patient[] result = new Patient[count];
         int index = 0;
 
         for (int i = 0; i < _count; i++)
