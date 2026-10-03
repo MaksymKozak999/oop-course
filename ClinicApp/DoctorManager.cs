@@ -10,13 +10,14 @@ internal class DoctorManager
 
     public int Count => _count;
 
-    public Doctor? this[int index]
+    public Doctor this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
             {
-                return null;
+                throw new IndexOutOfRangeException("Індекс виходить за межі масиву докторів.");
+
             }
 
             return _doctors[index];

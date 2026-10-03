@@ -13,13 +13,13 @@ internal class AppointmentManager
 
     public int Count => _count;
 
-    public Appointment? this[int index]
+    public Appointment this[int index]
     {
         get
         {
             if (index < 0 || index >= _count)
             {
-                return null;
+                throw new IndexOutOfRangeException("Індекс виходить за межі масиву записів.");
             }
 
             return _appointments[index];

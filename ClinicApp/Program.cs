@@ -28,6 +28,8 @@ class Program
             "LIC-003",
             "0503333333");
 
+        
+
         clinic.Doctors.Add(doctor1);
         clinic.Doctors.Add(doctor2);
         clinic.Doctors.Add(doctor3);
@@ -63,6 +65,15 @@ class Program
         string patientNameNullSafe = clinic.Patients.FindById(99)?.FullName ?? "не знайдено";
         Console.WriteLine($"Результат безперечного пошуку (ID 99): {patientNameNullSafe}");
         Console.WriteLine("===================================================\n");
+
+        Console.WriteLine("\n=== Демонстрація WorkSchedule (Value Type) ===");
+        WorkSchedule morning = new WorkSchedule(8, 12);
+        WorkSchedule copy = morning;
+        copy = new WorkSchedule(9, 15);
+
+        Console.WriteLine($"Оригінал (morning): {morning}"); 
+        Console.WriteLine($"Копія (copy):       {copy}");    
+        Console.WriteLine("===============================================\n");
 
         bool exit = false;
 
@@ -330,10 +341,10 @@ class Program
                     Doctor doctor = new Doctor(
                         firstName,
                         lastName,
-                        speciality,
-                        licenseNumber,
-                        phone,
-                        schedule
+                        licenseNumber,  
+                        phone,          
+                        schedule,      
+                        speciality      
                     );
 
                     clinic.Doctors.Add(doctor);
