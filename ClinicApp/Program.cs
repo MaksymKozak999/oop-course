@@ -48,15 +48,11 @@ class Program
             "LIC-003",
             "0503333333");
         
-
-        
         clinic.Patients.Add(p2);
         clinic.Doctors.Add(doctor1);
         clinic.Doctors.Add(doctor2);
         clinic.Doctors.Add(doctor3);
-
-       
-
+        
         Console.WriteLine("\n=== Демонстрація Перевантаження, Out, ?. та ?? ===");
 
         Doctor[] cardiologists = clinic.Doctors.FindBySpeciality(Speciality.Cardiology); 
