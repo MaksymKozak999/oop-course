@@ -93,7 +93,6 @@ internal class Doctor
     {
         string formattedPhone = ClinicFormatter.FormatPhone(Phone);
         string formattedSpeciality = ClinicFormatter.FormatSpeciality(Speciality);
-
         return $"[{Id}] Dr. {FullName} | {formattedSpeciality} | Ліцензія: {LicenseNumber} | Тел: {formattedPhone} | {Schedule}";
     }
 }

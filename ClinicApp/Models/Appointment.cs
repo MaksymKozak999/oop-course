@@ -75,7 +75,6 @@ internal class Appointment
         {
             result += $" | {Notes}";
         }
-
         return result;
     }
 }
