@@ -58,7 +58,6 @@ internal class Doctor
             _phone = value;
         }
     }
-
     public string FullName => $"{FirstName} {LastName}";
 
     public bool IsAvailableNow => Schedule.IsNow;
@@ -78,17 +77,12 @@ internal class Doctor
 
         Id = _nextId++;
     }
-
     public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
-        : this(firstName, lastName, licenseNumber, phone, new WorkSchedule(8, 17), speciality)
-    {
-    }
-
+        : this(firstName, lastName, licenseNumber, phone, new WorkSchedule(8, 17), speciality) { }
     public bool CanAcceptAt(int hour)
     {
         return Schedule.Contains(hour);
     }
-
     public override string ToString()
     {
         string formattedPhone = ClinicFormatter.FormatPhone(Phone);

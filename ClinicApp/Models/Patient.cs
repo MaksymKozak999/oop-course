@@ -72,7 +72,6 @@ internal class Patient
     }
 
     public bool IsAdult => Age >= 18;
-
     public Patient(): this("Невідомий", "Пацієнт", DateTime.Today.AddYears(-26), BloodType.Unknown, "0000000000",string.Empty) { }
     
     public Patient(string firstName, string lastName): this(firstName, lastName, DateTime.Today, BloodType.Unknown, "0000000000", string.Empty) { }

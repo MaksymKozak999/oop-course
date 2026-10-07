@@ -53,7 +53,6 @@ internal class Appointment
             return false;
         }
     }
-
     public bool Complete()
     {
         if (Status == AppointmentStatus.Scheduled)
