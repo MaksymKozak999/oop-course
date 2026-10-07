@@ -1,6 +1,6 @@
 using System;
-
-namespace ClinicApp;
+using ClinicApp.Models;
+namespace ClinicApp.Managers;
 
 internal class AppointmentManager
 {

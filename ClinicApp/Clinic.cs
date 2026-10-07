@@ -1,5 +1,11 @@
-namespace ClinicApp;
 
+
+using ClinicApp.Enums;
+using ClinicApp.Managers;
+using ClinicApp.Models;
+using ClinicApp.Utils;
+
+namespace ClinicApp;
 internal class Clinic
 {
     private string _name;

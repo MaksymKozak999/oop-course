@@ -1,18 +1,59 @@
-namespace ClinicApp;
-
-using static BloodType;
+using ClinicApp.Enums;
+using System;
+using ClinicApp.Utils;
+namespace ClinicApp.Models;
 
 internal class Patient
 {
     private static int _nextId = 1;
 
     public int Id { get; }
-    public string FirstName { get; private set; } = "Невідомий";
-    public string LastName { get; private set; } = "Пацієнт";
-    public DateTime DateOfBirth { get; private set; }
+    private string _firstName = string.Empty;
+    private string _lastName = string.Empty;
+    private DateTime _dateOfBirth;
+    private string _phone = string.Empty;
     public BloodType BloodType { get; private set; } = BloodType.Unknown;
-    public string Phone { get; private set; } = "0000000000";
     public string Email { get; private set; } = string.Empty;
+
+    public string FirstName
+    {
+        get => _firstName;
+        private set
+        {
+            ClinicValidator.ValidateName(value, nameof(FirstName));
+            _firstName = value;
+        }
+    }
+
+    public string LastName
+    {
+        get => _lastName;
+        private set
+        {
+            ClinicValidator.ValidateName(value, nameof(LastName));
+            _lastName = value;
+        }
+    }
+
+    public DateTime DateOfBirth
+    {
+        get => _dateOfBirth;
+        private set
+        {
+           ClinicValidator.ValidateDate(value, nameof(DateOfBirth));
+            _dateOfBirth = value;
+        }
+    }
+
+    public string Phone
+    {
+        get => _phone;
+        private set
+        {
+            ClinicValidator.ValidatePhone(value);
+            _phone = value;
+        }
+    }
 
     public string FullName => $"{FirstName} {LastName}";
 
@@ -40,13 +81,14 @@ internal class Patient
 
     public Patient(string firstName, string lastName, DateTime dateOfBirth, BloodType bloodType, string phone, string email = "")
     {
-        this.Id = _nextId++;
-        this.FirstName = firstName;
-        this.LastName = lastName;
-        this.DateOfBirth = dateOfBirth;
-        this.BloodType = bloodType;
-        this.Phone = phone;
-        this.Email = email;
+        FirstName = firstName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        BloodType = bloodType;
+        Phone = phone;
+        Email = email;
+
+        Id = _nextId++;
     }
 
     public string GetAgeCategory()

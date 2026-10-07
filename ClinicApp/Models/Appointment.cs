@@ -1,5 +1,8 @@
 using System;
-namespace ClinicApp;
+using ClinicApp.Utils;
+using ClinicApp.Enums;
+
+namespace ClinicApp.Models;
 
 internal class Appointment
 {
@@ -9,22 +12,31 @@ internal class Appointment
     public int PatientId { get;}
     public int DoctorId { get; }
     public DateTime ScheduledAt { get; set; }
-    public int DurationMinutes { get; set; }
+    private int _durationMinutes;
     public AppointmentStatus Status {  get; private set; }
     public string Notes {  get; private set; }
-
     public DateTime EndsAt => ScheduledAt.AddMinutes(DurationMinutes);
     public bool IsUpcoming => ScheduledAt > DateTime.Now && Status == AppointmentStatus.Scheduled;
-
-    public Appointment(int patientId,int doctorId,DateTime scheduledAt,int durationMinutes = 30)
+    public int DurationMinutes
     {
+        get => _durationMinutes;
+        set
+        {
+            ClinicValidator.ValidatePositive(value, nameof(DurationMinutes));
+            _durationMinutes = value;
+        }
+    }
+
+    public Appointment(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
+    {
+        PatientId = patientId;
+        DoctorId = doctorId;
+        ScheduledAt = scheduledAt;
+        DurationMinutes = durationMinutes;
+        Status = AppointmentStatus.Scheduled;
+        Notes = "";
+
         Id = _nextId++;
-        this.PatientId = patientId;
-        this.DoctorId = doctorId;
-        this.ScheduledAt = scheduledAt;
-        this.DurationMinutes = durationMinutes;
-        this.Status = AppointmentStatus.Scheduled;
-        this.Notes = "";
     }
     public bool Cancel(string reason = "")
     {
