@@ -1,6 +1,6 @@
-using System.Linq;
+namespace ClinicApp.Utils;
 
-namespace ClinicApp;
+using ClinicApp.Enums;
 
 public static class ClinicFormatter
 {
@@ -65,7 +65,12 @@ public static class ClinicFormatter
             return phone;
         }
 
-        string digits = new string(phone.Where(char.IsDigit).ToArray());
+        string digits = "";
+        foreach (char c in phone)
+        {
+            if (char.IsDigit(c))
+                digits += c;
+        }
 
         if (digits.Length == 10)
         {

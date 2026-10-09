@@ -1,12 +1,32 @@
 ﻿using System;
 using ClinicApp;
 
+using ClinicApp.Enums;
+using ClinicApp.Managers;
+using ClinicApp.Models;
+using ClinicApp.Utils;
+
 class Program
 {
     static void Main()
     {
         Clinic clinic = new Clinic("Медична Клініка");
+        try
+        {
+            WorkSchedule w1 = new WorkSchedule(20, 6);
+            Patient p1 = new Patient("Maksym", "Петренко",new DateTime(2026, 10, 8),BloodType.ANegative,"0980908307","text@gmail.com");
 
+            Doctor d4 = new Doctor("Test", "Test", "Lic-0000123123", "0980908307", w1, Speciality.Cardiology);
+
+            clinic.Doctors.Add(d4);
+            clinic.Patients.Add(p1);
+        }
+        catch (ArgumentException e)
+        {
+            Console.WriteLine(e);
+            
+        }
+        Patient p2 = new Patient("Oleh", "Петренко",new DateTime(2010, 10, 8),BloodType.ANegative,"0980908307","text@gmail.com");
         Doctor doctor1 = new Doctor(
             "Іван",
             "Петренко",
@@ -27,17 +47,12 @@ class Program
             Speciality.Neurology,
             "LIC-003",
             "0503333333");
-
         
-
+        clinic.Patients.Add(p2);
         clinic.Doctors.Add(doctor1);
         clinic.Doctors.Add(doctor2);
         clinic.Doctors.Add(doctor3);
-
-        Console.WriteLine(doctor1);
-        Console.WriteLine(doctor2);
-        Console.WriteLine(doctor3);
-
+        
         Console.WriteLine("\n=== Демонстрація Перевантаження, Out, ?. та ?? ===");
 
         Doctor[] cardiologists = clinic.Doctors.FindBySpeciality(Speciality.Cardiology); 
@@ -153,39 +168,48 @@ class Program
                     break;
 
                 case "2":
-                    Console.Write("Ім'я: ");
-                    string firstName = Console.ReadLine();
-
-                    Console.Write("Прізвище: ");
-                    string lastName = Console.ReadLine();
-
-                    Console.Write("Дата народження (дд.мм.рррр): ");
-                    DateTime dateOfBirth = DateTime.Parse(Console.ReadLine());
-
-                    Console.Write("Група крові: ");
-                    string bloodTypeStr = Console.ReadLine();
-                    if (!Enum.TryParse(bloodTypeStr, true, out BloodType bloodType))
+                    try
                     {
-                        bloodType = BloodType.Unknown;
+                        Console.Write("Ім'я: ");
+                        string firstName = Console.ReadLine();
+
+                        Console.Write("Прізвище: ");
+                        string lastName = Console.ReadLine();
+
+                        Console.Write("Дата народження (дд.мм.рррр): ");
+                        DateTime dateOfBirth = DateTime.Parse(Console.ReadLine());
+
+                        Console.Write("Група крові: ");
+                        string bloodTypeStr = Console.ReadLine();
+                        if (!Enum.TryParse(bloodTypeStr, true, out BloodType bloodType))
+                        {
+                            bloodType = BloodType.Unknown;
+                        }
+
+                        Console.Write("Телефон: ");
+                        string phone = Console.ReadLine();
+
+                        Console.Write("Email: ");
+                        string email = Console.ReadLine();
+
+                        Patient patient = new Patient(
+                            firstName,
+                            lastName,
+                            dateOfBirth,
+                            bloodType,
+                            phone,
+                            email
+                        );
+
+                        clinic.Patients.Add(patient);
+                        Console.WriteLine("Пацієнта додано");
                     }
-
-                    Console.Write("Телефон: ");
-                    string phone = Console.ReadLine();
-
-                    Console.Write("Email: ");
-                    string email = Console.ReadLine();
-
-                    Patient patient = new Patient(
-                        firstName,
-                        lastName,
-                        dateOfBirth,
-                        bloodType,
-                        phone,
-                        email
-                    );
-
-                    clinic.Patients.Add(patient);
+                    catch (ArgumentException  e)
+                    {
+                        Console.WriteLine("Помилка: " + e.Message);
+                    }
                     break;
+                    
 
                 case "3":
                     Console.Write("Введіть ID: ");
@@ -304,51 +328,61 @@ class Program
                     break;
 
                 case "2":
-                    Console.Write("Ім'я: ");
-                    string firstName = Console.ReadLine();
-
-                    Console.Write("Прізвище: ");
-                    string lastName = Console.ReadLine();
-
-                    Console.Write("Спеціальність: ");
-                    string specialityStr = Console.ReadLine();
-
-                    if (!Enum.TryParse(specialityStr, true, out Speciality speciality))
+                    try
                     {
-                        speciality = Speciality.General;
+                        Console.Write("Ім'я: ");
+                        string firstName = Console.ReadLine();
+
+                        Console.Write("Прізвище: ");
+                        string lastName = Console.ReadLine();
+
+                        Console.Write("Спеціальність: ");
+                        string specialityStr = Console.ReadLine();
+
+                        if (!Enum.TryParse(specialityStr, true, out Speciality speciality))
+                        {
+                            speciality = Speciality.General;
+                        }
+
+                        Console.Write("Номер ліцензії: ");
+                        string licenseNumber = Console.ReadLine();
+
+                        Console.Write("Телефон: ");
+                        string phone = Console.ReadLine();
+
+                        Console.Write("Початок робочого дня (година): ");
+                        if (!int.TryParse(Console.ReadLine(), out int workStartHour))
+                        {
+                            workStartHour = 8;
+                        }
+
+                        Console.Write("Кінець робочого дня (година): ");
+                        if (!int.TryParse(Console.ReadLine(), out int workEndHour))
+                        {
+                            workEndHour = 17;
+                        }
+
+                        WorkSchedule schedule = new WorkSchedule(workStartHour, workEndHour);
+
+                        Doctor doctor = new Doctor(
+                            firstName,
+                            lastName,
+                            licenseNumber,  
+                            phone,          
+                            schedule,      
+                            speciality      
+                        );
+
+                        clinic.Doctors.Add(doctor);
+                        Console.WriteLine("Доктор додано");
+                        
                     }
-
-                    Console.Write("Номер ліцензії: ");
-                    string licenseNumber = Console.ReadLine();
-
-                    Console.Write("Телефон: ");
-                    string phone = Console.ReadLine();
-
-                    Console.Write("Початок робочого дня (година): ");
-                    if (!int.TryParse(Console.ReadLine(), out int workStartHour))
+                    catch (ArgumentException  e)
                     {
-                        workStartHour = 8;
+                        Console.WriteLine("Помилка: " + e.Message);
                     }
-
-                    Console.Write("Кінець робочого дня (година): ");
-                    if (!int.TryParse(Console.ReadLine(), out int workEndHour))
-                    {
-                        workEndHour = 17;
-                    }
-
-                    WorkSchedule schedule = new WorkSchedule(workStartHour, workEndHour);
-
-                    Doctor doctor = new Doctor(
-                        firstName,
-                        lastName,
-                        licenseNumber,  
-                        phone,          
-                        schedule,      
-                        speciality      
-                    );
-
-                    clinic.Doctors.Add(doctor);
                     break;
+                    
 
                 case "3":
                     Console.Write("Введіть ID: ");
@@ -467,33 +501,36 @@ class Program
                     break;
 
                 case "2":
-                    Console.Write("ID пацієнта: ");
-                    int patientId = int.Parse(Console.ReadLine());
-
-                    Console.Write("ID лікаря: ");
-                    int doctorId = int.Parse(Console.ReadLine());
-
-                    Console.Write("Дата та час (дд.мм.рррр ГГ:хх): ");
-                    DateTime scheduledAt = DateTime.Parse(Console.ReadLine());
-
-                    Console.Write("Тривалість у хвилинах: ");
-                    int duration = int.Parse(Console.ReadLine());
-
-                    if (clinic.Appointments.Book(
-                        patientId,
-                        doctorId,
-                        scheduledAt,
-                        duration))
+                    try
                     {
+                        Console.Write("ID пацієнта: ");
+                        int patientId = int.Parse(Console.ReadLine());
+
+                        Console.Write("ID лікаря: ");
+                        int doctorId = int.Parse(Console.ReadLine());
+
+                        Console.Write("Дата та час (дд.мм.рррр ГГ:хх): ");
+                        DateTime scheduledAt = DateTime.Parse(Console.ReadLine());
+
+                        Console.Write("Тривалість у хвилинах: ");
+                        int duration = int.Parse(Console.ReadLine());
+
+                        clinic.Appointments.Book(
+                            patientId,
+                            doctorId,
+                            scheduledAt,
+                            duration);
+                        
                         Console.WriteLine("Запис успішно створено.");
+                        
                     }
-                    else
+                    catch (ArgumentOutOfRangeException e)
                     {
                         Console.WriteLine("Не вдалося створити запис.");
+                        Console.WriteLine("Помилка: " + e.Message);
                     }
-
                     break;
-
+                    
                 case "3":
                     Console.Write("ID пацієнта: ");
                     int patientSearchId = int.Parse(Console.ReadLine());
