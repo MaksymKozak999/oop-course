@@ -13,6 +13,19 @@ internal class AppointmentManager
 
     public int Count => _count;
 
+    public Appointment[] GetAll()
+    {
+        Appointment[] result = new Appointment[_count];
+
+        for (int i = 0; i < _count; i++)
+        {
+            result[i] = _appointments[i];
+        }
+
+        return result;
+
+    }
+    
     public Appointment this[int index]
     {
         get
