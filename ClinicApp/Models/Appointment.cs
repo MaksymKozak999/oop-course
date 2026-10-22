@@ -5,7 +5,7 @@ using ClinicApp.Interfaces;
 
 namespace ClinicApp.Models;
 
-internal class Appointment : IPayable
+internal class Appointment : IPayable, ICancellable
 {
     private static int _nextId = 1;
 
@@ -20,6 +20,19 @@ internal class Appointment : IPayable
     public DateTime EndsAt => ScheduledAt.AddMinutes(DurationMinutes);
     public bool IsUpcoming => ScheduledAt > DateTime.Now && Status == AppointmentStatus.Scheduled;
     public bool IsPaid => _isPaid;
+    public bool IsCancelled => Status == AppointmentStatus.Cancelled;
+    public string CancellationReason
+    {
+        get
+        {
+            if (IsCancelled)
+            {
+                return Notes;
+            }
+
+            return "";
+        }
+    }
 
     public decimal GetCost()
     {
@@ -28,7 +41,7 @@ internal class Appointment : IPayable
 
     public void MarkPaid()
     {
-        if (Status != AppointmentStatus.Cancelled)
+        if (!IsCancelled)
         {
             _isPaid = true;
         }

@@ -1,5 +1,6 @@
 using System;
 using ClinicApp.Models;
+using ClinicApp.Interfaces;
 namespace ClinicApp.Managers;
 
 internal class AppointmentManager
@@ -25,7 +26,18 @@ internal class AppointmentManager
         return result;
 
     }
-    
+    public static int CancelAll(ICancellable[] items, string reason = "")
+    {
+        int count = 0;
+
+        foreach (ICancellable item in items)
+        {
+            if (item.Cancel(reason))
+                count++;
+        }
+
+        return count;
+    }
     public Appointment this[int index]
     {
         get
