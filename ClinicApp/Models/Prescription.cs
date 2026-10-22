@@ -48,4 +48,13 @@ public class Prescription : MedicalRecord
     public override string GetRecordType() => "Рецепт";
 
     public override bool IsActive() => ExpiresAt >= DateTime.Today;
+    
+    public override string ToString()
+    {
+        string result = $"[{Id}] {GetRecordType()} | {Date:dd.MM.yyyy} (до {ExpiresAt:dd.MM.yyyy}) | {GetSummary()}";
+        
+        if (!string.IsNullOrEmpty(Notes))
+            result += " | " + Notes;
+        return result;
+    }
 }
