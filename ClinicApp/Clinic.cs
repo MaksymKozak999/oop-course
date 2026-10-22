@@ -1,5 +1,3 @@
-
-
 using ClinicApp.Enums;
 using ClinicApp.Managers;
 using ClinicApp.Models;
@@ -12,11 +10,13 @@ internal class Clinic
     private PatientManager _patients;
     private DoctorManager _doctors;
     private AppointmentManager _appointments;
+    private MedicalRecordManager _medicalRecords;
 
     public string Name => _name;
     public PatientManager Patients => _patients;
     public DoctorManager Doctors => _doctors;
     public AppointmentManager Appointments => _appointments;
+    public MedicalRecordManager MedicalRecords => _medicalRecords;
 
     public Clinic(string name)
     {
@@ -24,6 +24,7 @@ internal class Clinic
         _patients = new PatientManager();
         _doctors = new DoctorManager();
         _appointments = new AppointmentManager(_patients, _doctors);
+        _medicalRecords = new MedicalRecordManager();
     }
 
     public void DisplaySchedule(DateTime date)
