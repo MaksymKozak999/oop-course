@@ -56,16 +56,15 @@ class Program
         Console.WriteLine("== new vs override ==");
         Console.WriteLine("Через Appointment:       " + asBase.GetDescription() + " | пріоритет " + asBase.GetPriority());
         Console.WriteLine("Через UrgentAppointment: " + urgent.GetDescription() + " | пріоритет " + urgent.GetPriority());
+        
 
         // 1) Чому GetDescription() через змінну типу Appointment дає опис термінового прийому?
-        //    GetDescription() — virtual в Appointment і override в UrgentAppointment. Для таких методів
+        //    GetDescription() це virtual в Appointment і override в UrgentAppointment. Для таких методів
         //    реалізацію обирають під час виконання за типом ОБ'ЄКТА, а об'єкт тут UrgentAppointment.
-        //
         // 2) Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт — UrgentAppointment?
         //    GetPriority() в Appointment не virtual, а в UrgentAppointment він схов;ний через new.
         //    Такий виклик вирішується ще під час компіляції за типом ЗМІННОЇ (Appointment),
         //    тому виконується метод батька, який повертає 3.
-        //
         // 3) Що треба змінити, щоб GetPriority() теж працював поліморфно?
         //    В Appointment зробити його virtual, а в UrgentAppointment замінити new на override.
         
