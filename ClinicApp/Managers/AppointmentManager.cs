@@ -13,7 +13,120 @@ internal class AppointmentManager
     private DoctorManager _doctors { get; }
 
     public int Count => _count;
+    
+    public Appointment[] GetUrgent()
+    {
+        int count = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+                count++;
+        }
 
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetSpecialist()
+    {
+        int count = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetRegular()
+    {
+        int count = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+            {
+                result[index] = _appointments[i];
+                index++;
+            }
+        }
+
+        return result;
+    }
+    public void DisplayAppointment(Appointment appointment)
+    {
+        Patient? patient = _patients.FindById(appointment.PatientId);
+        Doctor? doctor = _doctors.FindById(appointment.DoctorId);
+
+        string patientName = $"Пацієнт #{appointment.PatientId}";
+        if (patient != null)
+        {
+            patientName = patient.FullName;
+        }
+
+        string doctorName = $"Лікар #{appointment.DoctorId}";
+        if (doctor != null)
+        {
+            doctorName = doctor.FullName;
+        }
+
+        Console.WriteLine(
+            $"[{appointment.Id}] {appointment.GetDescription()} | {patientName} → {doctorName} | " +
+            $"{appointment.ScheduledAt:dd.MM.yyyy HH:mm}-{appointment.EndsAt:HH:mm} | " +
+            $"{appointment.Status} | {appointment.GetCost().ToString("F2")} грн");
+    }
+    
+    private bool AddAppointment(Appointment appointment)
+    {
+        if (_count >= MaxAppointments)
+            return false;
+
+        if (_patients.FindById(appointment.PatientId) == null)
+        {
+            Console.WriteLine("Пацієнта не знайдено.");
+            return false;
+        }
+
+        if (_doctors.FindById(appointment.DoctorId) == null)
+        {
+            Console.WriteLine("Лікаря не знайдено.");
+            return false;
+        }
+
+        _appointments[_count] = appointment;
+        _count++;
+
+        return true;
+    }
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
@@ -60,27 +173,18 @@ internal class AppointmentManager
 
     public bool Book(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
     {
-        if (_count >= MaxAppointments)
-            return false;
+        return AddAppointment(new RegularAppointment(patientId, doctorId, scheduledAt, durationMinutes));
+    }
+    public bool BookUrgent(int patientId, int doctorId, DateTime scheduledAt,
+        string urgencyNote = "", int durationMinutes = 30)
+    {
+        return AddAppointment(new UrgentAppointment(patientId, doctorId, scheduledAt, urgencyNote, durationMinutes));
+    }
 
-        if (_patients.FindById(patientId) == null)
-        {
-            Console.WriteLine("Пацієнта не знайдено.");
-            return false;
-        }
-
-        if (_doctors.FindById(doctorId) == null)
-        {
-            Console.WriteLine("Лікаря не знайдено.");
-            return false;
-        }
-
-        Appointment appointment = new Appointment(patientId, doctorId, scheduledAt, durationMinutes);
-
-        _appointments[_count] = appointment;
-        _count++;
-
-        return true;
+    public bool BookSpecialist(int patientId, int doctorId, DateTime scheduledAt,
+        string topic = "", int durationMinutes = 45)
+    {
+        return AddAppointment(new SpecialistAppointment(patientId, doctorId, scheduledAt, topic, durationMinutes));
     }
 
     public bool Cancel(int id, string reason)
@@ -179,22 +283,7 @@ internal class AppointmentManager
         Array.Resize(ref result, resultCount);
         return result;
     }
-
-    public void DisplayAppointment(Appointment appointment)
-    {
-        Patient? patient = _patients.FindById(appointment.PatientId);
-        Doctor? doctor = _doctors.FindById(appointment.DoctorId);
-
-        string patientName = patient != null ? patient.FullName : $"Пацієнт #{appointment.PatientId}";
-        string doctorName = doctor != null ? doctor.FullName : $"Лікар #{appointment.DoctorId}";
-
-        Console.WriteLine(
-            $"[{appointment.Id}] {patientName} → {doctorName} | " +
-            $"{appointment.ScheduledAt:dd.MM.yyyy HH:mm}-" +
-            $"{appointment.EndsAt:HH:mm} | " +
-            $"{appointment.Status}");
-    }
-
+    
     public void DisplayList(Appointment[] appointments)
     {
         if (appointments.Length == 0)

@@ -45,7 +45,29 @@ class Program
         clinic.MedicalRecords.Add(new Diagnosis(2, 2, DateTime.Today.AddDays(-40), "J20", "Гострий бронхіт", false));
 
         clinic.MedicalRecords.Add(new LabResult(3, 3, DateTime.Today.AddDays(-2), "Загальний аналіз крові", 5.0, "10^9/л", "4.0-9.0", true));
+        
+        clinic.Appointments.Book(1, 1, DateTime.Today.AddDays(1).AddHours(9));
+        clinic.Appointments.BookUrgent(2, 2, DateTime.Today.AddDays(1).AddHours(10), "Сильний біль");
+        clinic.Appointments.BookSpecialist(3, 3, DateTime.Today.AddDays(1).AddHours(11), "Невралгія");
+        
+        UrgentAppointment urgent = new UrgentAppointment(1, 1, DateTime.Today.AddDays(1).AddHours(14), "тест");
+        Appointment asBase = urgent;
 
+        Console.WriteLine("== new vs override ==");
+        Console.WriteLine("Через Appointment:       " + asBase.GetDescription() + " | пріоритет " + asBase.GetPriority());
+        Console.WriteLine("Через UrgentAppointment: " + urgent.GetDescription() + " | пріоритет " + urgent.GetPriority());
+        
+
+        // 1) Чому GetDescription() через змінну типу Appointment дає опис термінового прийому?
+        //    GetDescription() це virtual в Appointment і override в UrgentAppointment. Для таких методів
+        //    реалізацію обирають під час виконання за типом ОБ'ЄКТА, а об'єкт тут UrgentAppointment.
+        // 2) Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт — UrgentAppointment?
+        //    GetPriority() в Appointment не virtual, а в UrgentAppointment він схов;ний через new.
+        //    Такий виклик вирішується ще під час компіляції за типом ЗМІННОЇ (Appointment),
+        //    тому виконується метод батька, який повертає 3.
+        // 3) Що треба змінити, щоб GetPriority() теж працював поліморфно?
+        //    В Appointment зробити його virtual, а в UrgentAppointment замінити new на override.
+        
         bool exit = false;
 
         while (!exit)
@@ -212,7 +234,12 @@ class Program
                         string lastName = Console.ReadLine();
 
                         Console.Write("Дата народження (дд.мм.рррр): ");
-                        DateTime dateOfBirth = DateTime.Parse(Console.ReadLine());
+                        if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy",
+                                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateOfBirth))
+                        {
+                            Console.WriteLine("Помилка: введіть дату у форматі дд.мм.рррр.");
+                            break;
+                        }
 
                         Console.Write("Група крові: ");
                         string bloodTypeStr = Console.ReadLine();
@@ -841,6 +868,7 @@ class Program
             Console.WriteLine("6. Скасувати запис");
             Console.WriteLine("7. Завершити запис");
             Console.WriteLine("8. Скасувати всі записи пацієнта");
+            Console.WriteLine("9. За типом прийому");
             Console.WriteLine("0. Назад у головне меню");
             Console.Write("Оберіть дію: ");
 
@@ -864,7 +892,12 @@ class Program
                         int doctorId = int.Parse(Console.ReadLine());
 
                         Console.Write("Дата та час (дд.мм.рррр ГГ:хх): ");
-                        DateTime scheduledAt = DateTime.Parse(Console.ReadLine());
+                        if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy HH:mm",
+                                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime scheduledAt))
+                        {
+                            Console.WriteLine("Помилка: введіть дату у форматі дд.мм.рррр ГГ:хх (наприклад, 23.11.2026 12:30).");
+                            break;
+                        }
 
                         Console.Write("Тривалість у хвилинах: ");
                         int duration = int.Parse(Console.ReadLine());
@@ -878,6 +911,11 @@ class Program
                         Console.WriteLine("Запис успішно створено.");
                     }
                     catch (ArgumentException e)
+                    {
+                        Console.WriteLine("Не вдалося створити запис.");
+                        Console.WriteLine("Помилка: " + e.Message);
+                    }
+                    catch (FormatException e)
                     {
                         Console.WriteLine("Не вдалося створити запис.");
                         Console.WriteLine("Помилка: " + e.Message);
@@ -970,6 +1008,35 @@ class Program
                     int cancelled = AppointmentManager.CancelAll(
                         clinic.Appointments.GetByPatient(cancelPatientId), cancelReason);
                     Console.WriteLine($"Скасовано записів: {cancelled}");
+                    break;
+                case "9":
+                    Console.WriteLine("  1. Термінові");
+                    Console.WriteLine("  2. Консультації спеціаліста");
+                    Console.WriteLine("  3. Звичайні");
+                    Console.Write("Оберіть: ");
+                    string? typeChoice = Console.ReadLine();
+
+                    Appointment[] byType;
+                    
+                    if (typeChoice == "1")
+                    {
+                        byType = clinic.Appointments.GetUrgent();
+                    }
+                    else if (typeChoice == "2")
+                    {
+                        byType = clinic.Appointments.GetSpecialist();
+                    }
+                    else if (typeChoice == "3")
+                    {
+                        byType = clinic.Appointments.GetRegular();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некоректний вибір.");
+                        break;
+                    }
+
+                    clinic.Appointments.DisplayList(byType);
                     break;
 
                 case "0":
