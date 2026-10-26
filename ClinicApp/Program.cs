@@ -45,7 +45,30 @@ class Program
         clinic.MedicalRecords.Add(new Diagnosis(2, 2, DateTime.Today.AddDays(-40), "J20", "Гострий бронхіт", false));
 
         clinic.MedicalRecords.Add(new LabResult(3, 3, DateTime.Today.AddDays(-2), "Загальний аналіз крові", 5.0, "10^9/л", "4.0-9.0", true));
+        
+        clinic.Appointments.Book(1, 1, DateTime.Today.AddDays(1).AddHours(9));
+        clinic.Appointments.BookUrgent(2, 2, DateTime.Today.AddDays(1).AddHours(10), "Сильний біль");
+        clinic.Appointments.BookSpecialist(3, 3, DateTime.Today.AddDays(1).AddHours(11), "Невралгія");
+        
+        UrgentAppointment urgent = new UrgentAppointment(1, 1, DateTime.Today.AddDays(1).AddHours(14), "тест");
+        Appointment asBase = urgent;
 
+        Console.WriteLine("== new vs override ==");
+        Console.WriteLine("Через Appointment:       " + asBase.GetDescription() + " | пріоритет " + asBase.GetPriority());
+        Console.WriteLine("Через UrgentAppointment: " + urgent.GetDescription() + " | пріоритет " + urgent.GetPriority());
+
+        // 1) Чому GetDescription() через змінну типу Appointment дає опис термінового прийому?
+        //    GetDescription() — virtual в Appointment і override в UrgentAppointment. Для таких методів
+        //    реалізацію обирають під час виконання за типом ОБ'ЄКТА, а об'єкт тут UrgentAppointment.
+        //
+        // 2) Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт — UrgentAppointment?
+        //    GetPriority() в Appointment не virtual, а в UrgentAppointment він схов;ний через new.
+        //    Такий виклик вирішується ще під час компіляції за типом ЗМІННОЇ (Appointment),
+        //    тому виконується метод батька, який повертає 3.
+        //
+        // 3) Що треба змінити, щоб GetPriority() теж працював поліморфно?
+        //    В Appointment зробити його virtual, а в UrgentAppointment замінити new на override.
+        
         bool exit = false;
 
         while (!exit)

@@ -13,7 +13,29 @@ internal class AppointmentManager
     private DoctorManager _doctors { get; }
 
     public int Count => _count;
+    
+    private bool AddAppointment(Appointment appointment)
+    {
+        if (_count >= MaxAppointments)
+            return false;
 
+        if (_patients.FindById(appointment.PatientId) == null)
+        {
+            Console.WriteLine("Пацієнта не знайдено.");
+            return false;
+        }
+
+        if (_doctors.FindById(appointment.DoctorId) == null)
+        {
+            Console.WriteLine("Лікаря не знайдено.");
+            return false;
+        }
+
+        _appointments[_count] = appointment;
+        _count++;
+
+        return true;
+    }
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
@@ -60,27 +82,18 @@ internal class AppointmentManager
 
     public bool Book(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
     {
-        if (_count >= MaxAppointments)
-            return false;
+        return AddAppointment(new RegularAppointment(patientId, doctorId, scheduledAt, durationMinutes));
+    }
+    public bool BookUrgent(int patientId, int doctorId, DateTime scheduledAt,
+        string urgencyNote = "", int durationMinutes = 30)
+    {
+        return AddAppointment(new UrgentAppointment(patientId, doctorId, scheduledAt, urgencyNote, durationMinutes));
+    }
 
-        if (_patients.FindById(patientId) == null)
-        {
-            Console.WriteLine("Пацієнта не знайдено.");
-            return false;
-        }
-
-        if (_doctors.FindById(doctorId) == null)
-        {
-            Console.WriteLine("Лікаря не знайдено.");
-            return false;
-        }
-
-        Appointment appointment = new Appointment(patientId, doctorId, scheduledAt, durationMinutes);
-
-        _appointments[_count] = appointment;
-        _count++;
-
-        return true;
+    public bool BookSpecialist(int patientId, int doctorId, DateTime scheduledAt,
+        string topic = "", int durationMinutes = 45)
+    {
+        return AddAppointment(new SpecialistAppointment(patientId, doctorId, scheduledAt, topic, durationMinutes));
     }
 
     public bool Cancel(int id, string reason)
