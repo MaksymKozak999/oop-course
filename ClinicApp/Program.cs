@@ -235,7 +235,12 @@ class Program
                         string lastName = Console.ReadLine();
 
                         Console.Write("Дата народження (дд.мм.рррр): ");
-                        DateTime dateOfBirth = DateTime.Parse(Console.ReadLine());
+                        if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy",
+                                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateOfBirth))
+                        {
+                            Console.WriteLine("Помилка: введіть дату у форматі дд.мм.рррр.");
+                            break;
+                        }
 
                         Console.Write("Група крові: ");
                         string bloodTypeStr = Console.ReadLine();
@@ -864,6 +869,7 @@ class Program
             Console.WriteLine("6. Скасувати запис");
             Console.WriteLine("7. Завершити запис");
             Console.WriteLine("8. Скасувати всі записи пацієнта");
+            Console.WriteLine("9. За типом прийому");
             Console.WriteLine("0. Назад у головне меню");
             Console.Write("Оберіть дію: ");
 
@@ -887,7 +893,12 @@ class Program
                         int doctorId = int.Parse(Console.ReadLine());
 
                         Console.Write("Дата та час (дд.мм.рррр ГГ:хх): ");
-                        DateTime scheduledAt = DateTime.Parse(Console.ReadLine());
+                        if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy HH:mm",
+                                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime scheduledAt))
+                        {
+                            Console.WriteLine("Помилка: введіть дату у форматі дд.мм.рррр ГГ:хх (наприклад, 23.11.2026 12:30).");
+                            break;
+                        }
 
                         Console.Write("Тривалість у хвилинах: ");
                         int duration = int.Parse(Console.ReadLine());
@@ -901,6 +912,11 @@ class Program
                         Console.WriteLine("Запис успішно створено.");
                     }
                     catch (ArgumentException e)
+                    {
+                        Console.WriteLine("Не вдалося створити запис.");
+                        Console.WriteLine("Помилка: " + e.Message);
+                    }
+                    catch (FormatException e)
                     {
                         Console.WriteLine("Не вдалося створити запис.");
                         Console.WriteLine("Помилка: " + e.Message);
@@ -993,6 +1009,35 @@ class Program
                     int cancelled = AppointmentManager.CancelAll(
                         clinic.Appointments.GetByPatient(cancelPatientId), cancelReason);
                     Console.WriteLine($"Скасовано записів: {cancelled}");
+                    break;
+                case "9":
+                    Console.WriteLine("  1. Термінові");
+                    Console.WriteLine("  2. Консультації спеціаліста");
+                    Console.WriteLine("  3. Звичайні");
+                    Console.Write("Оберіть: ");
+                    string? typeChoice = Console.ReadLine();
+
+                    Appointment[] byType;
+                    
+                    if (typeChoice == "1")
+                    {
+                        byType = clinic.Appointments.GetUrgent();
+                    }
+                    else if (typeChoice == "2")
+                    {
+                        byType = clinic.Appointments.GetSpecialist();
+                    }
+                    else if (typeChoice == "3")
+                    {
+                        byType = clinic.Appointments.GetRegular();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некоректний вибір.");
+                        break;
+                    }
+
+                    clinic.Appointments.DisplayList(byType);
                     break;
 
                 case "0":
