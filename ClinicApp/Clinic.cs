@@ -11,6 +11,7 @@ internal class Clinic
     private DoctorManager _doctors;
     private AppointmentManager _appointments;
     private MedicalRecordManager _medicalRecords;
+    public BillingManager Billing { get; }
 
     public string Name => _name;
     public PatientManager Patients => _patients;
@@ -25,6 +26,7 @@ internal class Clinic
         _doctors = new DoctorManager();
         _appointments = new AppointmentManager(_patients, _doctors);
         _medicalRecords = new MedicalRecordManager();
+        Billing = new BillingManager(Appointments);
     }
 
     public void DisplaySchedule(DateTime date)

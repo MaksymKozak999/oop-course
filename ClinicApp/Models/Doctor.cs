@@ -1,10 +1,11 @@
 using System;
 using ClinicApp.Enums;
 using ClinicApp.Utils;
+using ClinicApp.Interfaces;
 
 namespace ClinicApp.Models;
 
-internal class Doctor
+internal class Doctor : ISchedulable
 {
     private static int _nextId = 1;
     public int Id { get; }
@@ -16,6 +17,26 @@ internal class Doctor
 
     public Speciality Speciality { get; }
     public WorkSchedule Schedule { get; set; }
+    
+    public bool CanSchedule(DateTime at)
+    {
+        return at.Hour >= Schedule.Start && at.Hour < Schedule.End;
+    }
+    public DateTime[] GetAvailableSlots(DateTime date, int slotCount)
+    {
+        ClinicValidator.ValidatePositive(slotCount, nameof(slotCount));
+
+        int totalHours = Schedule.End -  Schedule.Start;
+        int count = Math.Min(slotCount, totalHours);
+
+        DateTime[] slots = new DateTime[count];
+        for (int i = 0; i < count; i++)
+        {
+            slots[i] = date.Date.AddHours(Schedule.Start + i);
+        }
+
+        return slots;
+    }
 
     public string FirstName
     {
