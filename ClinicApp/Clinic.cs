@@ -11,6 +11,8 @@ internal class Clinic
     private DoctorManager _doctors;
     private AppointmentManager _appointments;
     private MedicalRecordManager _medicalRecords;
+	private WaitingQueue<Patient> _waitingRoom;
+
     public BillingManager Billing { get; }
 
     public string Name => _name;
@@ -18,6 +20,7 @@ internal class Clinic
     public DoctorManager Doctors => _doctors;
     public AppointmentManager Appointments => _appointments;
     public MedicalRecordManager MedicalRecords => _medicalRecords;
+	public WaitingQueue<Patient> WaitingRoom => _waitingRoom;
 
     public Clinic(string name)
     {
@@ -26,6 +29,7 @@ internal class Clinic
         _doctors = new DoctorManager();
         _appointments = new AppointmentManager(_patients, _doctors);
         _medicalRecords = new MedicalRecordManager();
+		_waitingRoom = new WaitingQueue<Patient>();
         Billing = new BillingManager(Appointments);
     }
 
