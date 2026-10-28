@@ -37,4 +37,9 @@ public class WaitingQueue<T>
         }
         return _patients.Peek();
     }
+
+    public T[] ToArray()
+    {
+        return _patients.ToArray();
+    }
 }
