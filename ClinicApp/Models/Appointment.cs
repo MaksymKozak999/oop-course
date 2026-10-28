@@ -5,7 +5,7 @@ using ClinicApp.Interfaces;
 
 namespace ClinicApp.Models;
 
-internal class Appointment : IPayable, ICancellable
+internal class Appointment : IPayable, ICancellable,IIdentifiable
 {
     private static int _nextId = 1;
 

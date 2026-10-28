@@ -5,7 +5,7 @@ using ClinicApp.Interfaces;
 
 namespace ClinicApp.Models;
 
-internal class Doctor : ISchedulable
+internal class Doctor : ISchedulable,IIdentifiable
 {
     private static int _nextId = 1;
     public int Id { get; }
