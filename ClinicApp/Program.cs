@@ -419,7 +419,7 @@ class Program
                         Console.WriteLine($"Знайдено пацієнтів з групою {btQuery} ({btResults.Length}):");
                         foreach (Patient p in btResults)
                         {
-                            Console.WriteLine($"[{p.Id}] {p.FullName} | {p.BloodType}");
+                            Console.WriteLine($"[{p.Id}] {p.FullName} | {ClinicFormatter.FormatBloodType(p.BloodType)}");
                         }
                     }
                     else

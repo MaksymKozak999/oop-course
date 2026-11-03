@@ -1,6 +1,7 @@
 using System;
 using ClinicApp.Models;
 using ClinicApp.Enums;
+using ClinicApp.Utils;
 namespace ClinicApp.Managers;
 
 internal class PatientManager
@@ -117,7 +118,7 @@ internal class PatientManager
                 status = "дорослий";
             }
  
-            Console.WriteLine($"[{p.Id}] {p.FirstName} {p.LastName} | Вік: {p.Age} ({status}) | кров: {p.BloodType} | Тел: {p.Phone}");
+            Console.WriteLine($"[{p.Id}] {p.FirstName} {p.LastName} | Вік: {p.Age} ({status}) | кров: {ClinicFormatter.FormatBloodType(p.BloodType)} | Тел: {p.Phone}");
         }
     }
 
