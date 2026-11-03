@@ -56,7 +56,7 @@ internal class Appointment : IPayable, ICancellable,IIdentifiable
 
     public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
     }
 
     public virtual string GetDescription()
