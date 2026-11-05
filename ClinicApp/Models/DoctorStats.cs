@@ -29,6 +29,14 @@ public class DoctorStats : IComparable<DoctorStats>
     
     public override string ToString()
     {
-        return $"ID: {DoctorId}, Ім'я: {FullName}, Прийомів: {AppointmentCount}, Виручка: {TotalRevenue}, Останній прийом: {LastAppointmentDate}";
+        if (LastAppointmentDate == DateTime.MinValue)
+        {
+            return $"[{DoctorId}] | {FullName} | Прийомів: {AppointmentCount} | Виручка: {TotalRevenue.ToString("F2")} | Останній прийом: -- ";
+        }
+        else
+        {
+            return $"[{DoctorId}] | {FullName} | Прийомів: {AppointmentCount} | Виручка: {TotalRevenue.ToString("F2")} | Останній прийом: {LastAppointmentDate}";
+        }
+ 
     }
 }
