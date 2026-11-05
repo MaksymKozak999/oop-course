@@ -28,7 +28,14 @@ public class PatientStats : IComparable<PatientStats>
     }
     public override string ToString()
     {
-        return $"ID: {PatientId}, Ім'я: {FullName}, Відвідування: {VisitCount},  Cума витрат: {TotalSpent}, Останній візит: {LastVisitDate}";
+        if (LastVisitDate == DateTime.MinValue)
+        {
+            return $"[{PatientId}] | {FullName} | Візитів: {VisitCount} | Витрачено: {TotalSpent.ToString("F2")} | Останній візит: -- ";
+        }
+        else
+        {
+            return $"[{PatientId}] | {FullName} | Візитів: {VisitCount} | Витрачено: {TotalSpent.ToString("F2")} | Останній візит: {LastVisitDate}";
+        }
     }
     
     
