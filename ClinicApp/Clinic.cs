@@ -21,6 +21,7 @@ internal class Clinic
     public AppointmentManager Appointments => _appointments;
     public MedicalRecordManager MedicalRecords => _medicalRecords;
 	public WaitingQueue<Patient> WaitingRoom => _waitingRoom;
+    public AnalyticsManager Analytics { get; }
 
     public Clinic(string name)
     {
@@ -31,6 +32,7 @@ internal class Clinic
         _medicalRecords = new MedicalRecordManager();
 		_waitingRoom = new WaitingQueue<Patient>();
         Billing = new BillingManager(Appointments);
+        Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
     }
 
     public void DisplaySchedule(DateTime date)
