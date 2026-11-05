@@ -7,6 +7,7 @@ using ClinicApp.Managers;
 using ClinicApp.Models;
 using ClinicApp.Utils;
 using ClinicApp.Interfaces;
+using ClinicApp.Comparators;
 
 class Program
 {
@@ -61,12 +62,17 @@ class Program
         // 1) Чому GetDescription() через змінну типу Appointment дає опис термінового прийому?
         //    GetDescription() це virtual в Appointment і override в UrgentAppointment. Для таких методів
         //    реалізацію обирають під час виконання за типом ОБ'ЄКТА, а об'єкт тут UrgentAppointment.
-        // 2) Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт — UrgentAppointment?
+        // 2) Чому GetPriority() через ту саму змінну повертає 3, хоча об'єкт - UrgentAppointment?
         //    GetPriority() в Appointment не virtual, а в UrgentAppointment він схов;ний через new.
         //    Такий виклик вирішується ще під час компіляції за типом ЗМІННОЇ (Appointment),
         //    тому виконується метод батька, який повертає 3.
         // 3) Що треба змінити, щоб GetPriority() теж працював поліморфно?
         //    В Appointment зробити його virtual, а в UrgentAppointment замінити new на override.
+        
+        foreach (DoctorStats s in clinic.Analytics.ComputeDoctorStats())
+        {
+            Console.WriteLine(s);
+        }
         
         bool exit = false;
 
@@ -106,6 +112,10 @@ class Program
                 case "7":
                     clinic.GenerateReport();
                     break;
+                
+                case "8":
+                    AnalyticsMenu(clinic);
+                    break;
 
                 case "0":
                     exit = true;
@@ -123,100 +133,101 @@ class Program
         Console.WriteLine("╔" + new string('═', 46) + "╗");
         Console.WriteLine("║" + "          МЕДИЧНА КЛІНІКА".PadRight(46) + "║");
         Console.WriteLine("╠" + new string('═', 46) + "╣");
-        Console.WriteLine("║" + "  1. Пацієнти       — реєстрація, пошук".PadRight(46) + "║");
-        Console.WriteLine("║" + "  2. Лікарі         — персонал, розклад".PadRight(46) + "║");
-        Console.WriteLine("║" + "  3. Записи         — прийоми, скасування".PadRight(46) + "║");
-        Console.WriteLine("║" + "  4. Медична картка — діагнози, рецепти".PadRight(46) + "║");
-        Console.WriteLine("║" + "  5. Рахунки        — оплата, борги".PadRight(46) + "║");
-        Console.WriteLine("║" + "  6. Черга — очікування, прийом".PadRight(46) + "║");
-        Console.WriteLine("║" + "  7. Звіт           — загальна статистика".PadRight(46) + "║");
+        Console.WriteLine("║" + "  1. Пацієнти       - реєстрація, пошук".PadRight(46) + "║");
+        Console.WriteLine("║" + "  2. Лікарі         - персонал, розклад".PadRight(46) + "║");
+        Console.WriteLine("║" + "  3. Записи         - прийоми, скасування".PadRight(46) + "║");
+        Console.WriteLine("║" + "  4. Медична картка - діагнози, рецепти".PadRight(46) + "║");
+        Console.WriteLine("║" + "  5. Рахунки        - оплата, борги".PadRight(46) + "║");
+        Console.WriteLine("║" + "  6. Черга          - очікування, прийом".PadRight(46) + "║");
+        Console.WriteLine("║" + "  7. Звіт           - загальна статистика".PadRight(46) + "║");
+        Console.WriteLine("║" + "  8. Аналітика      -".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
     }
     
     private static void WaitingRoomMenu(Clinic clinic)
-{
-    while (true)
     {
-        Console.WriteLine("\n=== Черга пацієнтів ===");
-        Console.WriteLine("1 — Додати пацієнта до черги");
-        Console.WriteLine("2 — Прийняти первого");
-        Console.WriteLine("3 — Хто перший?");
-        Console.WriteLine("4 — Переглянути всю чергу");
-        Console.WriteLine("0 — Назад");
-        Console.Write("Оберіть дію: ");
-
-        string choice = Console.ReadLine()?.Trim();
-
-        switch (choice)
+        while (true)
         {
-            case "1":
-                Console.Write("Введіть ID пацієнта: ");
-                if (int.TryParse(Console.ReadLine(), out int id))
-                {
-                    Patient? patient = clinic.Patients.FindById(id);
-                    if (patient != null)
+            Console.WriteLine("\n=== Черга пацієнтів ===");
+            Console.WriteLine("1 - Додати пацієнта до черги");
+            Console.WriteLine("2 - Прийняти первого");
+            Console.WriteLine("3 - Хто перший?");
+            Console.WriteLine("4 - Переглянути всю чергу");
+            Console.WriteLine("0 - Назад");
+            Console.Write("Оберіть дію: ");
+
+            string choice = Console.ReadLine()?.Trim();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Введіть ID пацієнта: ");
+                    if (int.TryParse(Console.ReadLine(), out int id))
                     {
-                        clinic.WaitingRoom.Enqueue(patient);
-                        Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FirstName} {patient.LastName} додано до черги.");
+                        Patient? patient = clinic.Patients.FindById(id);
+                        if (patient != null)
+                        {
+                            clinic.WaitingRoom.Enqueue(patient);
+                            Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FirstName} {patient.LastName} додано до черги.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Пацієнта не знайдено.");
+                        }
+                    }
+                    break;
+
+                case "2":
+                    try
+                    {
+                        Patient p = clinic.WaitingRoom.Dequeue();
+                        Console.WriteLine($"Прийнято пацієнта: {p.FirstName} {p.LastName}. Лишилось у черзі: {clinic.WaitingRoom.Count}");
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    break;
+
+                case "3":
+                    try
+                    {
+                        Patient p = clinic.WaitingRoom.Peek();
+                        Console.WriteLine($"Перший у черзі: {p.FirstName} {p.LastName}");
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    break;
+
+                case "4":
+                    Patient[] queueArray = clinic.WaitingRoom.ToArray();
+                    if (queueArray.Length == 0)
+                    {
+                        Console.WriteLine("Черга порожня.");
                     }
                     else
                     {
-                        Console.WriteLine("Пацієнта не знайдено.");
+                        Console.WriteLine("--- Поточний стан черги ---");
+                        for (int i = 0; i < queueArray.Length; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. [{queueArray[i].Id}] {queueArray[i].FirstName} {queueArray[i].LastName}");
+                        }
                     }
-                }
-                break;
+                    break;
 
-            case "2":
-                try
-                {
-                    Patient p = clinic.WaitingRoom.Dequeue();
-                    Console.WriteLine($"Прийнято пацієнта: {p.FirstName} {p.LastName}. Лишилось у черзі: {clinic.WaitingRoom.Count}");
-                }
-                catch (InvalidOperationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                break;
+                case "0":
+                    return;
 
-            case "3":
-                try
-                {
-                    Patient p = clinic.WaitingRoom.Peek();
-                    Console.WriteLine($"Перший у черзі: {p.FirstName} {p.LastName}");
-                }
-                catch (InvalidOperationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                break;
-
-            case "4":
-                Patient[] queueArray = clinic.WaitingRoom.ToArray();
-                if (queueArray.Length == 0)
-                {
-                    Console.WriteLine("Черга порожня.");
-                }
-                else
-                {
-                    Console.WriteLine("--- Поточний стан черги ---");
-                    for (int i = 0; i < queueArray.Length; i++)
-                    {
-                        Console.WriteLine($"{i + 1}. [{queueArray[i].Id}] {queueArray[i].FirstName} {queueArray[i].LastName}");
-                    }
-                }
-                break;
-
-            case "0":
-                return;
-
-            default:
-                Console.WriteLine("Невірний вибір.");
-                break;
+                default:
+                    Console.WriteLine("Невірний вибір.");
+                    break;
+            }
         }
     }
-}
     static void BillingMenu(Clinic clinic)
     {
         bool back = false;
@@ -285,7 +296,93 @@ class Program
             }
         }
     }
+    private static List<DoctorStats> CollectDoctorStats(Clinic clinic)
+    {
+        List<DoctorStats> list = new List<DoctorStats>();
+        foreach (var stat in clinic.Analytics.ComputeDoctorStats())
+        {
+            list.Add(stat);
+        }
+        return list;
+    }
 
+    private static List<PatientStats> CollectPatientStats(Clinic clinic)
+    {
+        List<PatientStats> list = new List<PatientStats>();
+        foreach (var stat in clinic.Analytics.ComputePatientStats())
+        {
+            list.Add(stat);
+        }
+        return list;
+    }
+    private static void PrintList<T>(IEnumerable<T> items)
+    {
+        Console.WriteLine();
+        foreach (var item in items)
+        {
+            Console.WriteLine(item);
+        }
+    }
+    private static void AnalyticsMenu(Clinic clinic)
+    {
+        while (true)
+        {
+            Console.WriteLine("\n- Аналітика -");
+            Console.WriteLine("1. Лікарі за навантаженням");
+            Console.WriteLine("2. Лікарі за виручкою");
+            Console.WriteLine("3. Лікарі за іменем");
+            Console.WriteLine("4. Пацієнти за кількістю візитів");
+            Console.WriteLine("5. Пацієнти за витратами");
+            Console.WriteLine("0. Назад");
+            Console.Write("Оберіть: ");
+
+            string? choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    {
+                        List<DoctorStats> doctors = CollectDoctorStats(clinic);
+                        doctors.Sort();
+                        PrintList(doctors);
+                        break;
+                    }
+                case "2":
+                    {
+                        List<DoctorStats> doctors = CollectDoctorStats(clinic);
+                        doctors.Sort(new DoctorStatsByRevenue()); 
+                        PrintList(doctors);
+                        break;
+                    }
+                case "3":
+                    {
+                        List<DoctorStats> doctors = CollectDoctorStats(clinic);
+                        doctors.Sort(new DoctorStatsByName());
+                        PrintList(doctors);
+                        break;
+                    }
+                case "4":
+                    {
+                        List<PatientStats> patients = CollectPatientStats(clinic);
+                        patients.Sort(); 
+                        PrintList(patients);
+                        break;
+                    }
+                case "5":
+                    {
+                        List<PatientStats> patients = CollectPatientStats(clinic);
+                        patients.Sort(new PatientStatsBySpent());
+                        PrintList(patients);
+                        break;
+                    }
+                case "0":
+                    return;
+                default:
+                    Console.WriteLine("Некоректна опція!");
+                    break;
+            }
+        }
+    }
     static void ManagePatients(Clinic clinic)
     {
         bool back = false;
@@ -1085,7 +1182,7 @@ class Program
                         break;
                     }
 
-                    Console.Write("Причина (Enter — без причини): ");
+                    Console.Write("Причина (Enter - без причини): ");
                     string? cancelReason = Console.ReadLine();
                     if (cancelReason == null)
                     {
