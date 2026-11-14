@@ -187,7 +187,6 @@ class Program
                     TreatmentPlan newPlan = FormBuilder.Build<TreatmentPlan>();
                     if (newPlan != null && clinic.TreatmentPlans.Add(newPlan))
                     {
-                        clinic.TreatmentPlans.Add(newPlan);
                         Console.WriteLine("План лікування успішно додано.");
                     }
                     break;
