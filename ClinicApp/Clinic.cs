@@ -1,7 +1,5 @@
-using ClinicApp.Enums;
 using ClinicApp.Managers;
 using ClinicApp.Models;
-using ClinicApp.Utils;
 
 namespace ClinicApp;
 internal class Clinic
@@ -12,6 +10,7 @@ internal class Clinic
     private AppointmentManager _appointments;
     private MedicalRecordManager _medicalRecords;
 	private WaitingQueue<Patient> _waitingRoom;
+    private TreatmentPlanManager _treatmentPlans;
 
     public BillingManager Billing { get; }
 
@@ -22,6 +21,8 @@ internal class Clinic
     public MedicalRecordManager MedicalRecords => _medicalRecords;
 	public WaitingQueue<Patient> WaitingRoom => _waitingRoom;
     public AnalyticsManager Analytics { get; }
+    public TreatmentPlanManager TreatmentPlans => _treatmentPlans;
+    
 
     public Clinic(string name)
     {
@@ -33,8 +34,8 @@ internal class Clinic
 		_waitingRoom = new WaitingQueue<Patient>();
         Billing = new BillingManager(Appointments);
         Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
+        _treatmentPlans = new TreatmentPlanManager();
     }
-
     public void DisplaySchedule(DateTime date)
     {
         Console.WriteLine($"=== Розклад на {date:dd.MM.yyyy} ===");
@@ -44,7 +45,6 @@ internal class Clinic
 
         Appointments.DisplayList(appointmentsForDate);
     }
-
     public void GenerateReport()
     {
         int upcomingAppointments =

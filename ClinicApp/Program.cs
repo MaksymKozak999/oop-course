@@ -116,7 +116,9 @@ class Program
                 case "8":
                     AnalyticsMenu(clinic);
                     break;
-
+                case "9":
+                    TreatmentPlanMenu(clinic);
+                    break;
                 case "0":
                     exit = true;
                     break;
@@ -141,11 +143,144 @@ class Program
         Console.WriteLine("║" + "  6. Черга          - очікування, прийом".PadRight(46) + "║");
         Console.WriteLine("║" + "  7. Звіт           - загальна статистика".PadRight(46) + "║");
         Console.WriteLine("║" + "  8. Аналітика      -".PadRight(46) + "║");
+        Console.WriteLine("║" + "  9. Плани лікування — рефлексія, атрибути.".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
     }
+
+    private static void TreatmentPlanMenu(Clinic clinic)
+    {
+        while (true)
+        {
+            Console.WriteLine("\n=== Плани лікування ===");
+            Console.WriteLine("1 — Показати всі плани");
+            Console.WriteLine("2 — Додати план лікування");
+            Console.WriteLine("3 — Плани пацієнта");
+            Console.WriteLine("4 — Активувати план");
+            Console.WriteLine("5 — Завершити план");
+            Console.WriteLine("6 — Скасувати план");
+            Console.WriteLine("7 — Інформація про тип TreatmentPlan");
+            Console.WriteLine("0 — Назад");
+            Console.Write("Ваш вибір: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    var allPlans = clinic.TreatmentPlans.GetAll();
+                    if (allPlans.Length == 0)
+                    {
+                        Console.WriteLine("Список планів лікування порожній.");
+                    }
+                    else
+                    {
+                        for (int i = 0; i < allPlans.Length; i++)
+                        {
+                            Console.WriteLine(allPlans[i]);
+                        }
+                    }
+                    break;
+
+                case "2":
+                    TreatmentPlan newPlan = FormBuilder.Build<TreatmentPlan>();
+                    if (newPlan != null && clinic.TreatmentPlans.Add(newPlan))
+                    {
+                        clinic.TreatmentPlans.Add(newPlan);
+                        Console.WriteLine("План лікування успішно додано.");
+                    }
+                    break;
+
+                case "3":
+                    Console.Write("Введіть ID пацієнта: ");
+                    if (int.TryParse(Console.ReadLine(), out int patientId))
+                    {
+                        var patientPlans = clinic.TreatmentPlans.GetByPatient(patientId);
+                        if (patientPlans.Length == 0)
+                        {
+                            Console.WriteLine("Для цього пацієнта планів лікування не знайдено.");
+                        }
+                        else
+                        {
+                            for (int i = 0; i < patientPlans.Length; i++)
+                            {
+                                Console.WriteLine(patientPlans[i]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некоректний формат ID.");
+                    }
+                    break;
+
+                case "4":
+                    ChangePlanStatus(clinic, "activate");
+                    break;
+
+                case "5":
+                    ChangePlanStatus(clinic, "complete");
+                    break;
+
+                case "6":
+                    ChangePlanStatus(clinic, "cancel");
+                    break;
+
+                case "7":
+                    ModelValidator.PrintInfo(typeof(TreatmentPlan));
+                    break;
+
+                case "0":
+                    return;
+
+                default:
+                    Console.WriteLine("Невідома команда. Спробуйте ще раз.");
+                    break;
+            }
+        }
+    }
     
+    static void ChangePlanStatus(Clinic clinic, string action)
+    {
+        Console.Write("Введіть ID плану: ");
+        if (!int.TryParse(Console.ReadLine(), out int planId))
+        {
+            Console.WriteLine("Некоректний формат ID.");
+            return;
+        }
+
+        TreatmentPlan targetPlan = clinic.TreatmentPlans.GetById(planId);
+
+        if (targetPlan == null)
+        {
+            Console.WriteLine("План не знайдено");
+            return;
+        }
+
+        bool success = false;
+        if (action == "activate")
+        {
+            success = targetPlan.Activate();
+        }
+        else if (action == "complete")
+        {
+            success = targetPlan.Complete();
+        }
+        else if (action == "cancel")
+        {
+            success = targetPlan.Cancel();
+        }
+
+        if (success)
+        {
+            Console.WriteLine("Статус плану успішно оновлено.");
+        }
+        else
+        {
+            Console.WriteLine("Неможливо змінити статус: перехід із поточного стану заборонено.");
+        }
+    }
     private static void WaitingRoomMenu(Clinic clinic)
     {
         while (true)
