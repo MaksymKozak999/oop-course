@@ -119,6 +119,9 @@ class Program
                 case "9":
                     TreatmentPlanMenu(clinic);
                     break;
+                case "10":
+                    FileMenu(clinic);
+                    break;
                 case "0":
                     exit = true;
                     break;
@@ -143,10 +146,58 @@ class Program
         Console.WriteLine("║" + "  6. Черга          - очікування, прийом".PadRight(46) + "║");
         Console.WriteLine("║" + "  7. Звіт           - загальна статистика".PadRight(46) + "║");
         Console.WriteLine("║" + "  8. Аналітика      -".PadRight(46) + "║");
-        Console.WriteLine("║" + "  9. Плани лікування — рефлексія, атрибути.".PadRight(46) + "║");
+        Console.WriteLine("║" + "  9. Плани лікування - рефлексія, атрибути.".PadRight(46) + "║");
+        Console.WriteLine("║" + "  10. Файли ".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
+    }
+
+    private static void FileMenu(Clinic clinic)
+    {
+        bool exit = false;
+        while (!exit)
+        {
+            Console.WriteLine("\n=== Дії з файлами ===");
+            Console.WriteLine("1 — Останні рядки лога");
+            Console.WriteLine("2 — Очистити лог");
+            Console.WriteLine("0 — Назад в меню");
+            
+            string choice = Console.ReadLine();
+            
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Введіть кількість рядків: ");
+                    if (!int.TryParse(Console.ReadLine(), out int n))
+                    {
+                        Console.WriteLine("Некоректне число.");
+                        break;
+                    }
+
+                    string[] lines = clinic.Logger.GetLastLines(n);
+                    if (lines.Length == 0)
+                    {
+                        Console.WriteLine("Лог порожній або не існує.");
+                    }
+                    else
+                    {
+                        foreach (string line in lines)
+                            Console.WriteLine(line);
+                    }
+                    break;
+                case "2":
+                    clinic.Logger.Clear();
+                    break;
+                case "0":
+                    exit = true;
+                    break;
+
+                default:
+                    Console.WriteLine("Некоректний вибір. Спробуйте ще раз.");
+                    break;
+            }
+        }
     }
 
     private static void TreatmentPlanMenu(Clinic clinic)
@@ -311,6 +362,10 @@ class Program
                             Console.WriteLine("Пацієнта не знайдено.");
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine("Помилка: некоректний ID.");
+                    }
                     break;
 
                 case "2":
@@ -408,6 +463,7 @@ class Program
 
                     if (clinic.Billing.PayAppointment(appointmentId))
                     {
+                        clinic.Logger.LogInfo($"Запис #{appointmentId} оплачено");
                         Console.WriteLine($"Запис [{appointmentId}] оплачено.");
                     }
                     else
@@ -582,10 +638,12 @@ class Program
                         );
 
                         clinic.Patients.Add(patient);
+                        clinic.Logger.LogInfo($"Додано пацієнта #{patient.Id}: {patient.FullName}");
                         Console.WriteLine("Пацієнта додано");
                     }
                     catch (ArgumentException e)
                     {
+                        clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                         Console.WriteLine("Помилка: " + e.Message);
                     }
                     break;
@@ -662,7 +720,11 @@ class Program
 
                 case "6":
                     Console.Write("Введіть ID для видалення: ");
-                    int removeId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int removeId))
+                    {
+                        Console.WriteLine("Помилка: Некоректне значення ID.");
+                        break;
+                    }
 
                     if (clinic.Patients.Remove(removeId))
                     {
@@ -796,6 +858,7 @@ class Program
                         }
                         catch (ArgumentException e)
                         {
+                            clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                             Console.WriteLine("Помилка: " + e.Message);
                         }
                         break;
@@ -858,6 +921,7 @@ class Program
                         }
                         catch (ArgumentException e)
                         {
+                            clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                             Console.WriteLine("Помилка: " + e.Message);
                         }
                         break;
@@ -917,6 +981,7 @@ class Program
                         }
                         catch (ArgumentException e)
                         {
+                            clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                             Console.WriteLine("Помилка: " + e.Message);
                         }
                         break;
@@ -1029,17 +1094,23 @@ class Program
                         );
 
                         clinic.Doctors.Add(doctor);
+                        clinic.Logger.LogInfo($"Додано лікаря #{doctor.Id}: {doctor.FullName}");
                         Console.WriteLine("Доктор додано");
                     }
                     catch (ArgumentException e)
                     {
+                        clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                         Console.WriteLine("Помилка: " + e.Message);
                     }
                     break;
 
                 case "3":
                     Console.Write("Введіть ID: ");
-                    int searchId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int searchId))
+                    {
+                        Console.WriteLine("Помилка: Некоректне значення ID.");
+                        break;
+                    }
 
                     if (clinic.Doctors.TryFindById(searchId, out Doctor found))
                     {
@@ -1137,13 +1208,18 @@ class Program
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
+                        clinic.Logger.LogWarning("Помилка введення: " + ex.Message);
                         Console.WriteLine("Помилка: " + ex.Message);
                     }
                     break;
 
                 case "6":
                     Console.Write("Введіть ID для видалення: ");
-                    int removeId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int removeId))
+                    {
+                        Console.WriteLine("Помилка: Некоректне значення ID.");
+                        break;
+                    }
 
                     if (clinic.Doctors.Remove(removeId))
                     {
@@ -1225,16 +1301,18 @@ class Program
                             doctorId,
                             scheduledAt,
                             duration);
-
+                        clinic.Logger.LogInfo($"Запис створено: пацієнт #{patientId} → лікар #{doctorId}");
                         Console.WriteLine("Запис успішно створено.");
                     }
                     catch (ArgumentException e)
                     {
+                        clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                         Console.WriteLine("Не вдалося створити запис.");
                         Console.WriteLine("Помилка: " + e.Message);
                     }
                     catch (FormatException e)
                     {
+                        clinic.Logger.LogWarning("Помилка введення: " + e.Message);
                         Console.WriteLine("Не вдалося створити запис.");
                         Console.WriteLine("Помилка: " + e.Message);
                     }
@@ -1242,7 +1320,11 @@ class Program
 
                 case "3":
                     Console.Write("ID пацієнта: ");
-                    int patientSearchId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int patientSearchId))
+                    {
+                        Console.WriteLine("Помилка: некоректний ID.");
+                        break;
+                    }
 
                     clinic.Appointments.DisplayList(
                         clinic.Appointments.GetByPatient(patientSearchId)
@@ -1252,7 +1334,11 @@ class Program
 
                 case "4":
                     Console.Write("ID лікаря: ");
-                    int doctorSearchId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int doctorSearchId))
+                    {
+                        Console.WriteLine("Помилка: некоректний ID.");
+                        break;
+                    }
 
                     clinic.Appointments.DisplayList(
                         clinic.Appointments.GetByDoctor(doctorSearchId)
@@ -1262,28 +1348,53 @@ class Program
 
                 case "5":
                     Console.Write("Рік (рррр): ");
-                    int year = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int year))
+                    {
+                        Console.WriteLine("Помилка: некоректний рік.");
+                        break;
+                    }
 
                     Console.Write("Місяць (мм): ");
-                    int month = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int month))
+                    {
+                        Console.WriteLine("Помилка: некоректний місяць.");
+                        break;
+                    }
 
                     Console.Write("День (дд): ");
-                    int day = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int day))
+                    {
+                        Console.WriteLine("Помилка: некоректний день.");
+                        break;
+                    }
 
-                    Appointment[] dateAppointments = clinic.Appointments.GetByDate(year, month, day);
-                    clinic.Appointments.DisplayList(dateAppointments);
+                    try
+                    {
+                        Appointment[] dateAppointments = clinic.Appointments.GetByDate(year, month, day);
+                        clinic.Appointments.DisplayList(dateAppointments);
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        clinic.Logger.LogWarning("Помилка введення: " + e.Message);
+                        Console.WriteLine("Помилка: некоректна дата.");
+                    }
 
                     break;
 
                 case "6":
                     Console.Write("ID запису: ");
-                    int cancelId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int cancelId))
+                    {
+                        Console.WriteLine("Помилка: некоректний ID.");
+                        break;
+                    }
 
                     Console.Write("Причина скасування: ");
                     string reason = Console.ReadLine();
 
                     if (clinic.Appointments.Cancel(cancelId, reason))
                     {
+                        clinic.Logger.LogInfo($"Запис #{cancelId} скасовано: {reason}");
                         Console.WriteLine("Запис скасовано.");
                     }
                     else
@@ -1295,10 +1406,15 @@ class Program
 
                 case "7":
                     Console.Write("ID запису: ");
-                    int completeId = int.Parse(Console.ReadLine());
+                    if (!int.TryParse(Console.ReadLine(), out int completeId))
+                    {
+                        Console.WriteLine("Помилка: некоректний ID.");
+                        break;
+                    }
 
                     if (clinic.Appointments.Complete(completeId))
                     {
+                        clinic.Logger.LogInfo($"Запис #{completeId} завершено");
                         Console.WriteLine("Запис завершено.");
                     }
                     else
