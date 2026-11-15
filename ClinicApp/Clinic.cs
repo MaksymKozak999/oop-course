@@ -13,6 +13,7 @@ internal class Clinic
 	private WaitingQueue<Patient> _waitingRoom;
     private TreatmentPlanManager _treatmentPlans;
     private ClinicLogger _logger;
+    private ClinicExporter _exporter;
 
     public BillingManager Billing { get; }
 
@@ -25,6 +26,7 @@ internal class Clinic
     public AnalyticsManager Analytics { get; }
     public TreatmentPlanManager TreatmentPlans => _treatmentPlans;
     public ClinicLogger Logger => _logger;
+    public ClinicExporter  Exporter=> _exporter;
     
 
     public Clinic(string name)
@@ -39,6 +41,7 @@ internal class Clinic
         Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
         _treatmentPlans = new TreatmentPlanManager();
         _logger = new ClinicLogger();
+        _exporter = new ClinicExporter(this);
     }
     public void DisplaySchedule(DateTime date)
     {

@@ -159,9 +159,10 @@ class Program
         while (!exit)
         {
             Console.WriteLine("\n=== Дії з файлами ===");
-            Console.WriteLine("1 — Останні рядки лога");
-            Console.WriteLine("2 — Очистити лог");
-            Console.WriteLine("0 — Назад в меню");
+            Console.WriteLine("1 - Останні рядки лога");
+            Console.WriteLine("2 - Очистити лог");
+            Console.WriteLine("3 - Експортувати всі звіти");
+            Console.WriteLine("0 - Назад в меню");
             
             string choice = Console.ReadLine();
             
@@ -188,6 +189,12 @@ class Program
                     break;
                 case "2":
                     clinic.Logger.Clear();
+                    break;
+                case "3":
+                    string[] paths = clinic.Exporter.ExportAll();
+                    Console.WriteLine("Звіти створено:");
+                    foreach (string path in paths)
+                        Console.WriteLine("  " + path);
                     break;
                 case "0":
                     exit = true;
