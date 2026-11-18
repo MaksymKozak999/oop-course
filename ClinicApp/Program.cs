@@ -28,6 +28,14 @@ class Program
         Doctor d2 = new Doctor("Олександр", "Шевченко", "LIC-002", "0502222222", w1, Speciality.Surgery);
         Doctor d3 = new Doctor("Андрій", "Мельник", "LIC-003", "0503333333", w1, Speciality.Neurology);
 
+        TreatmentPlan plan = new TreatmentPlan
+        {
+            PatientId = 1,
+            Diagnosis = "Гіпертонічна хвороба",
+            DurationDays = 30
+        };
+        clinic.TreatmentPlans.Add(plan);
+
         clinic.Patients.Add(p1);
         clinic.Patients.Add(p2);
         clinic.Patients.Add(p3);
@@ -162,7 +170,9 @@ class Program
             Console.WriteLine("1 - Останні рядки лога");
             Console.WriteLine("2 - Очистити лог");
             Console.WriteLine("3 - Експортувати всі звіти");
+            Console.WriteLine("4 - Імпорт пацієнтів з CSV");
             Console.WriteLine("0 - Назад в меню");
+            Console.Write("Оберіть дію: ");
             
             string choice = Console.ReadLine();
             
@@ -195,6 +205,13 @@ class Program
                     Console.WriteLine("Звіти створено:");
                     foreach (string path in paths)
                         Console.WriteLine("  " + path);
+                    break;
+                case "4":
+                    Console.Write("Шлях до CSV-файлу: ");
+                    string csvPath = Console.ReadLine() ?? "";
+                    ImportResult importResult = new CsvImporter().ImportPatients(clinic, csvPath);
+                    importResult.Print();
+                    clinic.Logger.LogInfo($"Імпорт CSV: імпортовано {importResult.Imported}, пропущено {importResult.Skipped}");
                     break;
                 case "0":
                     exit = true;
