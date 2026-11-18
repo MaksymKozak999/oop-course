@@ -154,16 +154,16 @@ class Program
         Console.WriteLine("╔" + new string('═', 46) + "╗");
         Console.WriteLine("║" + "          МЕДИЧНА КЛІНІКА".PadRight(46) + "║");
         Console.WriteLine("╠" + new string('═', 46) + "╣");
-        Console.WriteLine("║" + "  1. Пацієнти       - реєстрація, пошук".PadRight(46) + "║");
-        Console.WriteLine("║" + "  2. Лікарі         - персонал, розклад".PadRight(46) + "║");
-        Console.WriteLine("║" + "  3. Записи         - прийоми, скасування".PadRight(46) + "║");
-        Console.WriteLine("║" + "  4. Медична картка - діагнози, рецепти".PadRight(46) + "║");
-        Console.WriteLine("║" + "  5. Рахунки        - оплата, борги".PadRight(46) + "║");
-        Console.WriteLine("║" + "  6. Черга          - очікування, прийом".PadRight(46) + "║");
-        Console.WriteLine("║" + "  7. Звіт           - загальна статистика".PadRight(46) + "║");
-        Console.WriteLine("║" + "  8. Аналітика      -".PadRight(46) + "║");
+        Console.WriteLine("║" + "  1. Пацієнти        - реєстрація, пошук".PadRight(46) + "║");
+        Console.WriteLine("║" + "  2. Лікарі          - персонал, розклад".PadRight(46) + "║");
+        Console.WriteLine("║" + "  3. Записи          - прийоми, скасування".PadRight(46) + "║");
+        Console.WriteLine("║" + "  4. Медична картка  - діагнози, рецепти".PadRight(46) + "║");
+        Console.WriteLine("║" + "  5. Рахунки         - оплата, борги".PadRight(46) + "║");
+        Console.WriteLine("║" + "  6. Черга           - очікування, прийом".PadRight(46) + "║");
+        Console.WriteLine("║" + "  7. Звіт            - загальна статистика".PadRight(46) + "║");
+        Console.WriteLine("║" + "  8. Аналітика       -".PadRight(46) + "║");
         Console.WriteLine("║" + "  9. Плани лікування - рефлексія, атрибути.".PadRight(46) + "║");
-        Console.WriteLine("║" + "  10. Файли ".PadRight(46) + "║");
+        Console.WriteLine("║" + "  10.Файли ".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
@@ -201,12 +201,14 @@ class Program
                     }
                     else
                     {
+                        Console.WriteLine($"Останні ряди логу ({lines.Length})");
                         foreach (string line in lines)
                             Console.WriteLine(line);
                     }
                     break;
                 case "2":
                     clinic.Logger.Clear();
+                    Console.WriteLine("Лог очищено");
                     break;
                 case "3":
                     string[] paths = clinic.Exporter.ExportAll();
@@ -347,7 +349,7 @@ class Program
         }
         else if (action == "complete")
         {
-            success = targetPlan.Complete();
+            success = clinic.TreatmentPlans.Complete(planId);
         }
         else if (action == "cancel")
         {
@@ -495,7 +497,6 @@ class Program
 
                     if (clinic.Billing.PayAppointment(appointmentId))
                     {
-                        clinic.Logger.LogInfo($"Запис #{appointmentId} оплачено");
                         Console.WriteLine($"Запис [{appointmentId}] оплачено.");
                     }
                     else
@@ -670,7 +671,6 @@ class Program
                         );
 
                         clinic.Patients.Add(patient);
-                        clinic.Logger.LogInfo($"Додано пацієнта #{patient.Id}: {patient.FullName}");
                         Console.WriteLine("Пацієнта додано");
                     }
                     catch (ArgumentException e)
@@ -1330,7 +1330,6 @@ class Program
 
                         if (clinic.Appointments.Book(patientId, doctorId, scheduledAt, duration))
                         {
-                            clinic.Logger.LogInfo($"Запис створено: пацієнт #{patientId} → лікар #{doctorId}");
                             Console.WriteLine("Запис успішно створено.");
                         }
                         else
@@ -1428,7 +1427,6 @@ class Program
 
                     if (clinic.Appointments.Cancel(cancelId, reason))
                     {
-                        clinic.Logger.LogInfo($"Запис #{cancelId} скасовано: {reason}");
                         Console.WriteLine("Запис скасовано.");
                     }
                     else
@@ -1448,7 +1446,6 @@ class Program
 
                     if (clinic.Appointments.Complete(completeId))
                     {
-                        clinic.Logger.LogInfo($"Запис #{completeId} завершено");
                         Console.WriteLine("Запис завершено.");
                     }
                     else
@@ -1473,8 +1470,7 @@ class Program
                         cancelReason = "";
                     }
 
-                    int cancelled = AppointmentManager.CancelAll(
-                        clinic.Appointments.GetByPatient(cancelPatientId), cancelReason);
+                    int cancelled = clinic.Appointments.CancelAll(clinic.Appointments.GetByPatient(cancelPatientId), cancelReason);
                     Console.WriteLine($"Скасовано записів: {cancelled}");
                     break;
                 case "9":

@@ -1,6 +1,7 @@
 using ClinicApp.Managers;
 using ClinicApp.Models;
 using ClinicApp.Utils;
+using ClinicApp.Events;
 
 namespace ClinicApp;
 internal class Clinic
@@ -44,6 +45,21 @@ internal class Clinic
         _logger = new ClinicLogger();
         _exporter = new ClinicExporter(this);
         _session = new SessionManager();
+        SubscribeEvents();
+        
+        
+    }
+    private void SubscribeEvents()
+    {
+        _patients.PatientAdded += _logger.OnPatientAdded;
+
+        _appointments.AppointmentBooked += _logger.OnAppointmentBooked;
+        _appointments.AppointmentCancelled += _logger.OnAppointmentCancelled;
+        _appointments.AppointmentCompleted += _logger.OnAppointmentCompleted;
+        _appointments.UrgentAppointmentBooked += _logger.OnUrgentAppointmentBooked;
+
+        Billing.PaymentReceived += _logger.OnPaymentReceived;
+        _treatmentPlans.PlanCompleted += _logger.OnPlanCompleted;
     }
     public void DisplaySchedule(DateTime date)
     {

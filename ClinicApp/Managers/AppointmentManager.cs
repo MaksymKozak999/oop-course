@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using ClinicApp.Events;
 using ClinicApp.Models;
 using ClinicApp.Interfaces;
@@ -147,14 +149,21 @@ internal class AppointmentManager
         return result;
 
     }
-    public static int CancelAll(ICancellable[] items, string reason = "")
+    public int CancelAll(ICancellable[] items, string reason = "")
     {
         int count = 0;
 
         foreach (ICancellable item in items)
         {
             if (item.Cancel(reason))
+            {
                 count++;
+                if (item is Appointment a)
+                {
+                    AppointmentCancelled?.Invoke(this, new AppointmentEventArgs(
+                        a.Id, a.PatientId, a.DoctorId, a.ScheduledAt, reason));
+                }
+            }
         }
 
         return count;
@@ -183,14 +192,19 @@ internal class AppointmentManager
     {
         return AddAppointment(new RegularAppointment(patientId, doctorId, scheduledAt, durationMinutes));
     }
-    public bool BookUrgent(int patientId, int doctorId, DateTime scheduledAt,
-        string urgencyNote = "", int durationMinutes = 30)
+    public bool BookUrgent(int patientId, int doctorId, DateTime scheduledAt, string urgencyNote = "", int durationMinutes = 30)
     {
-        return AddAppointment(new UrgentAppointment(patientId, doctorId, scheduledAt, urgencyNote, durationMinutes));
+        UrgentAppointment appointment = new UrgentAppointment(patientId, doctorId, scheduledAt, urgencyNote, durationMinutes);
+
+        if (!AddAppointment(appointment))   
+            return false;
+
+        UrgentAppointmentBooked?.Invoke(this, new AppointmentEventArgs(
+            appointment.Id, patientId, doctorId, scheduledAt, urgencyNote));
+        return true;
     }
 
-    public bool BookSpecialist(int patientId, int doctorId, DateTime scheduledAt,
-        string topic = "", int durationMinutes = 45)
+    public bool BookSpecialist(int patientId, int doctorId, DateTime scheduledAt, string topic = "", int durationMinutes = 45)
     {
         return AddAppointment(new SpecialistAppointment(patientId, doctorId, scheduledAt, topic, durationMinutes));
     }
@@ -198,21 +212,30 @@ internal class AppointmentManager
     public bool Cancel(int id, string reason)
     {
         Appointment? appointment = FindById(id);
-
-        if (appointment == null)
+        if (appointment == null) 
             return false;
 
-        return appointment.Cancel(reason);
+        if (!appointment.Cancel(reason)) return false;
+
+        AppointmentCancelled?.Invoke(this, new AppointmentEventArgs(
+            appointment.Id, appointment.PatientId, appointment.DoctorId,
+            appointment.ScheduledAt, reason));
+        return true;
     }
 
     public bool Complete(int id)
     {
         Appointment? appointment = FindById(id);
-
-        if (appointment == null)
+        if (appointment == null) 
             return false;
 
-        return appointment.Complete();
+        if (!appointment.Complete()) 
+            return false;
+
+        AppointmentCompleted?.Invoke(this, new AppointmentEventArgs(
+            appointment.Id, appointment.PatientId, appointment.DoctorId,
+            appointment.ScheduledAt, appointment.Notes));
+        return true;
     }
 
     public Appointment[] GetByPatient(int patientId)
@@ -318,4 +341,7 @@ internal class AppointmentManager
     }
     
     public event EventHandler<AppointmentEventArgs>? AppointmentBooked;
+    public event EventHandler<AppointmentEventArgs>? AppointmentCancelled;
+    public event EventHandler<AppointmentEventArgs>? AppointmentCompleted;
+    public event EventHandler<AppointmentEventArgs>? UrgentAppointmentBooked;
 }
