@@ -1,5 +1,6 @@
 using ClinicApp.Managers;
 using ClinicApp.Models;
+using ClinicApp.Utils;
 
 namespace ClinicApp;
 internal class Clinic
@@ -11,7 +12,9 @@ internal class Clinic
     private MedicalRecordManager _medicalRecords;
 	private WaitingQueue<Patient> _waitingRoom;
     private TreatmentPlanManager _treatmentPlans;
-
+    private ClinicLogger _logger;
+    private ClinicExporter _exporter;
+    private SessionManager _session;
     public BillingManager Billing { get; }
 
     public string Name => _name;
@@ -22,6 +25,9 @@ internal class Clinic
 	public WaitingQueue<Patient> WaitingRoom => _waitingRoom;
     public AnalyticsManager Analytics { get; }
     public TreatmentPlanManager TreatmentPlans => _treatmentPlans;
+    public ClinicLogger Logger => _logger;
+    public ClinicExporter  Exporter=> _exporter;
+    public SessionManager Session => _session;
     
 
     public Clinic(string name)
@@ -35,6 +41,9 @@ internal class Clinic
         Billing = new BillingManager(Appointments);
         Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
         _treatmentPlans = new TreatmentPlanManager();
+        _logger = new ClinicLogger();
+        _exporter = new ClinicExporter(this);
+        _session = new SessionManager();
     }
     public void DisplaySchedule(DateTime date)
     {
