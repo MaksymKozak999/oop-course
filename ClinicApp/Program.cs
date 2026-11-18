@@ -8,6 +8,7 @@ using ClinicApp.Models;
 using ClinicApp.Utils;
 using ClinicApp.Interfaces;
 using ClinicApp.Comparators;
+using ClinicApp.Events;
 
 class Program
 {
@@ -16,8 +17,12 @@ class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+        
+        
 
         Clinic clinic = new Clinic("Медична Клініка");
+        
+        clinic.Appointments.AppointmentBooked += OnAppointmentBookedConsole;
         
         Patient p1 = new Patient("Maksym", "Петренко", new DateTime(2000, 10, 8), BloodType.ANegative, "0980908307", "text@gmail.com");
         Patient p2 = new Patient("Oleh", "Петренко", new DateTime(2010, 10, 8), BloodType.ANegative, "0980908307", "text@gmail.com");
@@ -138,7 +143,12 @@ class Program
             }
         }
     }
-
+    
+    static void OnAppointmentBookedConsole(object? sender, AppointmentEventArgs e)
+    {
+        Console.WriteLine($"  [EVENT] Запис #{e.AppointmentId} створено: пацієнт #{e.PatientId} → лікар #{e.DoctorId}, {e.ScheduledAt:dd.MM.yyyy HH:mm}");
+    }
+    
     static void PrintMainMenu()
     {
         Console.WriteLine("╔" + new string('═', 46) + "╗");
@@ -1318,13 +1328,15 @@ class Program
                         Console.Write("Тривалість у хвилинах: ");
                         int duration = int.Parse(Console.ReadLine());
 
-                        clinic.Appointments.Book(
-                            patientId,
-                            doctorId,
-                            scheduledAt,
-                            duration);
-                        clinic.Logger.LogInfo($"Запис створено: пацієнт #{patientId} → лікар #{doctorId}");
-                        Console.WriteLine("Запис успішно створено.");
+                        if (clinic.Appointments.Book(patientId, doctorId, scheduledAt, duration))
+                        {
+                            clinic.Logger.LogInfo($"Запис створено: пацієнт #{patientId} → лікар #{doctorId}");
+                            Console.WriteLine("Запис успішно створено.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Не вдалося створити запис.");
+                        }
                     }
                     catch (ArgumentException e)
                     {

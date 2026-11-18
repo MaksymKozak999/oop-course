@@ -1,4 +1,5 @@
 using System;
+using ClinicApp.Events;
 using ClinicApp.Models;
 using ClinicApp.Interfaces;
 namespace ClinicApp.Managers;
@@ -124,6 +125,13 @@ internal class AppointmentManager
 
         _appointments[_count] = appointment;
         _count++;
+        
+        AppointmentBooked?.Invoke(this, new AppointmentEventArgs(
+            appointment.Id,
+            appointment.PatientId,
+            appointment.DoctorId,
+            appointment.ScheduledAt,
+            appointment.Notes));
 
         return true;
     }
@@ -308,4 +316,6 @@ internal class AppointmentManager
 
         return null;
     }
+    
+    public event EventHandler<AppointmentEventArgs>? AppointmentBooked;
 }
