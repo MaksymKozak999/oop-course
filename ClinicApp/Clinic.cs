@@ -29,6 +29,7 @@ internal class Clinic
     public ClinicLogger Logger => _logger;
     public ClinicExporter  Exporter=> _exporter;
     public SessionManager Session => _session;
+    public PatientPassportWriter Passport { get; }
     
 
     public Clinic(string name)
@@ -45,6 +46,7 @@ internal class Clinic
         _logger = new ClinicLogger();
         _exporter = new ClinicExporter(this);
         _session = new SessionManager();
+        Passport = new PatientPassportWriter(this);
         SubscribeEvents();
         
         
@@ -60,6 +62,11 @@ internal class Clinic
 
         Billing.PaymentReceived += _logger.OnPaymentReceived;
         _treatmentPlans.PlanCompleted += _logger.OnPlanCompleted;
+
+        Patients.PatientAdded += Passport.PatientAdded;
+        Appointments.AppointmentCompleted += Passport.AppointmentCompleted;
+        TreatmentPlans.PlanCompleted += Passport.PlanCompleted;
+        
     }
     public void DisplaySchedule(DateTime date)
     {
