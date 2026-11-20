@@ -1,4 +1,6 @@
 using System.Text;
+using ClinicApp.Events;
+using ClinicApp.Utils;
 
 namespace ClinicApp.Utils;
 
@@ -59,5 +61,45 @@ public class ClinicLogger
         if(File.Exists(_logPath))
             return true;
         return false;
+    }
+    
+    public void OnPatientAdded(object? sender, PatientEventArgs e)
+    {
+        LogInfo($"Новий пацієнт #{e.PatientId}: {e.FullName}");
+    }
+
+    public void OnAppointmentBooked(object? sender, AppointmentEventArgs e)
+    {
+        LogInfo($"Запис #{e.AppointmentId} створено: пацієнт #{e.PatientId} → лікар #{e.DoctorId}");
+    }
+
+    public void OnAppointmentCancelled(object? sender, AppointmentEventArgs e)
+    {
+        LogInfo($"Запис #{e.AppointmentId} скасовано: {e.Notes}");
+    }
+
+    public void OnAppointmentCompleted(object? sender, AppointmentEventArgs e)
+    {
+        LogInfo($"Запис #{e.AppointmentId} завершено");
+    }
+
+    public void OnPaymentReceived(object? sender, PaymentEventArgs e)
+    {
+        LogInfo($"Оплата запису #{e.AppointmentId}: {e.Amount:F2} грн");
+    }
+
+    public void OnPlanCompleted(object? sender, TreatmentPlanEventArgs e)
+    {
+        LogInfo($"План лікування #{e.PlanId} завершено: {e.Diagnosis}");
+    }
+
+    public void OnUrgentAppointmentBooked(object? sender, AppointmentEventArgs e)
+    {
+        LogWarning($"ТЕРМІНОВИЙ запис #{e.AppointmentId}: {e.Notes}");
+
+        Directory.CreateDirectory("alerts");
+        string path = Path.Combine("alerts", $"urgent_{DateTime.Now:yyyy-MM-dd}.txt");
+        string line = $"[{DateTime.Now:HH:mm:ss}] Запис #{e.AppointmentId}: пацієнт #{e.PatientId} → лікар #{e.DoctorId}, {e.Notes}";
+        File.AppendAllText(path, line + Environment.NewLine, Encoding.UTF8);
     }
 }

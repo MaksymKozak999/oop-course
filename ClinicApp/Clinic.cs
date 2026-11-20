@@ -1,6 +1,7 @@
 using ClinicApp.Managers;
 using ClinicApp.Models;
 using ClinicApp.Utils;
+using ClinicApp.Events;
 
 namespace ClinicApp;
 internal class Clinic
@@ -28,6 +29,8 @@ internal class Clinic
     public ClinicLogger Logger => _logger;
     public ClinicExporter  Exporter=> _exporter;
     public SessionManager Session => _session;
+    public PatientPassportWriter Passport { get; }
+    public SessionEventTracker Tracker { get; }
     
 
     public Clinic(string name)
@@ -44,6 +47,36 @@ internal class Clinic
         _logger = new ClinicLogger();
         _exporter = new ClinicExporter(this);
         _session = new SessionManager();
+        Passport = new PatientPassportWriter(this);
+        Tracker = new SessionEventTracker(this);
+        SubscribeEvents();
+        
+        
+    }
+    private void SubscribeEvents()
+    {
+        _patients.PatientAdded += _logger.OnPatientAdded;
+
+        _appointments.AppointmentBooked += _logger.OnAppointmentBooked;
+        _appointments.AppointmentCancelled += _logger.OnAppointmentCancelled;
+        _appointments.AppointmentCompleted += _logger.OnAppointmentCompleted;
+        _appointments.UrgentAppointmentBooked += _logger.OnUrgentAppointmentBooked;
+
+        Billing.PaymentReceived += _logger.OnPaymentReceived;
+        _treatmentPlans.PlanCompleted += _logger.OnPlanCompleted;
+
+        Patients.PatientAdded += Passport.PatientAdded;
+        Appointments.AppointmentCompleted += Passport.AppointmentCompleted;
+        TreatmentPlans.PlanCompleted += Passport.PlanCompleted;
+
+        Patients.PatientAdded += Tracker.PatientAdded;
+        Appointments.AppointmentBooked += Tracker.AppointmentBooked;
+        Appointments.UrgentAppointmentBooked += Tracker.UrgentBook;
+        Appointments.AppointmentCancelled += Tracker.AppointmentCancelled;
+        Appointments.AppointmentCompleted += Tracker.AppointmentCompleted;
+        Billing.PaymentReceived += Tracker.PaymentReceived;
+        TreatmentPlans.PlanCompleted += Tracker.PlanCompleted;
+
     }
     public void DisplaySchedule(DateTime date)
     {

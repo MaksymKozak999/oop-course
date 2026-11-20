@@ -1,6 +1,7 @@
 using System;
 using ClinicApp.Models;
 using ClinicApp.Enums;
+using ClinicApp.Events;
 using ClinicApp.Utils;
 namespace ClinicApp.Managers;
 
@@ -25,7 +26,8 @@ internal class PatientManager
     public void Add(Patient patient)
     {
        _patients.Add(patient);
-        Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FirstName} {patient.LastName} додано.");
+       PatientAdded?.Invoke(this, new PatientEventArgs(patient.Id, patient.FullName));
+       Console.WriteLine($"Пацієнта [{patient.Id}] {patient.FirstName} {patient.LastName} додано.");
     }
 
     public Patient? FindById(int id)
@@ -159,4 +161,5 @@ internal class PatientManager
         Console.WriteLine($"Дорослих:     {adultCount} з {_patients.Count}");
         Console.WriteLine("==============================");
     }
+    public event EventHandler<PatientEventArgs>? PatientAdded;
 }

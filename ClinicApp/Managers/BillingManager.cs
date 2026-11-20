@@ -1,4 +1,5 @@
 ﻿using System;
+using ClinicApp.Events;
 using ClinicApp.Interfaces;
 using ClinicApp.Models;
 
@@ -45,6 +46,7 @@ internal class BillingManager
                     return false;
 
                 all[i].MarkPaid();
+                PaymentReceived?.Invoke(this,new PaymentEventArgs(all[i].Id, all[i].GetCost()));
                 return true;
             }
         }
@@ -95,4 +97,6 @@ internal class BillingManager
 
         return total;
     }
+
+    public event EventHandler<PaymentEventArgs>? PaymentReceived;
 }
