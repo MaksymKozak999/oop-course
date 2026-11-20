@@ -17,8 +17,6 @@ class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-        
-        
 
         Clinic clinic = new Clinic("Медична Клініка");
         
@@ -131,6 +129,8 @@ class Program
                     if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
                     {
                         clinic.Session.Save(clinic);
+                        clinic.Tracker.PrintSummary();
+                        clinic.Tracker.SaveSummary();
                         Console.WriteLine("Сесію збережено.");
                         clinic.Logger.LogInfo("Сесію збережено");
                     }
