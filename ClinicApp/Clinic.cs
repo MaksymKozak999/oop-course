@@ -31,6 +31,7 @@ internal class Clinic
     public SessionManager Session => _session;
     public PatientPassportWriter Passport { get; }
     public SessionEventTracker Tracker { get; }
+    public ReportManager Reports { get; }
     
 
     public Clinic(string name)
@@ -49,6 +50,7 @@ internal class Clinic
         _session = new SessionManager();
         Passport = new PatientPassportWriter(this);
         Tracker = new SessionEventTracker(this);
+        Reports = new ReportManager(_appointments, _doctors,_patients);
         SubscribeEvents();
         
         

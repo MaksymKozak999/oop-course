@@ -65,6 +65,7 @@ class Program
         UrgentAppointment urgent = new UrgentAppointment(1, 1, DateTime.Today.AddDays(1).AddHours(14), "тест");
         Appointment asBase = urgent;
         
+        
         if (clinic.Session.Exists())
         {
             Console.Write("Знайдено збережену сесію. Завантажити? (y/n): ");
@@ -124,6 +125,9 @@ class Program
                 case "10":
                     FileMenu(clinic);
                     break;
+                case "11":
+                    ReportsMenu(clinic);
+                    break;
                 case "0":    
                     Console.Write("Зберегти сесію? (y/n): ");
                     if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
@@ -164,6 +168,7 @@ class Program
         Console.WriteLine("║" + "  8. Аналітика       -".PadRight(46) + "║");
         Console.WriteLine("║" + "  9. Плани лікування - рефлексія, атрибути.".PadRight(46) + "║");
         Console.WriteLine("║" + "  10.Файли ".PadRight(46) + "║");
+        Console.WriteLine("║" + "  11. Звіти".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
@@ -320,6 +325,96 @@ class Program
 
                 default:
                     Console.WriteLine("Невідома команда. Спробуйте ще раз.");
+                    break;
+            }
+        }
+    }
+    
+    private static void ReportsMenu(Clinic clinic)
+    {
+        while (true)
+        {
+            Console.WriteLine("\n=== Звіти ===");
+            Console.WriteLine("1 — Спеціальності");
+            Console.WriteLine("2 — Найзавантаженіший лікар");
+            Console.WriteLine("3 — Пацієнти з кількома візитами");
+            Console.WriteLine("4 — Топ-3 лікарів за виручкою");
+            Console.WriteLine("5 — Чи є термінові записи");
+            Console.WriteLine("6 — Активні спеціальності");
+            Console.WriteLine("7 — Виручка по місяцях");
+            Console.WriteLine("0 — Назад");
+            Console.Write("Оберіть дію: ");
+
+            string? choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    foreach (var stat in clinic.Reports.GetSpecialityStats())
+                    {
+                        Console.WriteLine(stat);
+                    }
+                    break;
+
+                case "2":
+                    string? busiest = clinic.Reports.FindBusiestDoctorName();
+                    Console.WriteLine(busiest ?? "немає лікарів");
+                    break;
+
+                case "3":
+                    Console.Write("Мінімальна кількість візитів: ");
+                    if (!int.TryParse(Console.ReadLine(), out int minVisits))
+                    {
+                        Console.WriteLine("Некоректне число.");
+                        break;
+                    }
+
+                    var patients = clinic.Reports.GetPatientsWithMultipleVisits(minVisits).ToList();
+                    if (patients.Count == 0)
+                    {
+                        Console.WriteLine("Пацієнтів не знайдено.");
+                    }
+                    else
+                    {
+                        foreach (var name in patients)
+                        {
+                            Console.WriteLine(name);
+                        }
+                    }
+                    break;
+
+                case "4":
+                    int rank = 1;
+                    foreach (var doctor in clinic.Reports.GetTopEarners(3))
+                    {
+                        Console.WriteLine($"{rank}. {doctor}");
+                        rank++;
+                    }
+                    break;
+
+                case "5":
+                    Console.WriteLine(clinic.Reports.HasAnyUrgentAppointments() ? "Так" : "Ні");
+                    break;
+
+                case "6":
+                    foreach (var spec in clinic.Reports.GetActiveSpecialities())
+                    {
+                        Console.WriteLine(ClinicFormatter.FormatSpeciality(spec));
+                    }
+                    break;
+
+                case "7":
+                    foreach (var item in clinic.Reports.GetMonthlyRevenue())
+                    {
+                        Console.WriteLine($"{item.Year}/{item.Month:D2} — {item.Total:F2} грн");
+                    }
+                    break;
+
+                case "0":
+                    return;
+
+                default:
+                    Console.WriteLine("Некоректний вибір. Спробуйте ще раз.");
                     break;
             }
         }
