@@ -18,53 +18,41 @@ internal class AnalyticsManager
 
     public IEnumerable<DoctorStats> ComputeDoctorStats()
     {
-        foreach (var doctor in _doctorManager.GetAll())
+        var appointments = _appointmentManager.GetAll();
+
+        return _doctorManager.GetAll().Select(d =>
         {
-            int count = 0;
-            decimal sum = 0;
-            DateTime lastDate = DateTime.MinValue;
+            var doctorApps = appointments.Where(a => a.DoctorId == d.Id).ToList();
 
-            foreach (var appointment in _appointmentManager.GetAll())
-            {
-                if (appointment.DoctorId == doctor.Id)
-                {
-                    count++;
-                    sum += appointment.GetCost();
-                    if (appointment.ScheduledAt > lastDate)
-                    {
-                        lastDate =  appointment.ScheduledAt;
-                    }
-                }
-            }
-
-            DoctorStats dstat = new(doctor.Id, doctor.FullName, count,sum, lastDate);
-            yield return dstat;
-        }
+            return new DoctorStats(
+                d.Id,
+                d.FullName,
+                doctorApps.Count(),
+                doctorApps.Sum(a => a.GetCost()),
+                doctorApps.Any() ? doctorApps.Max(a => a.ScheduledAt) : DateTime.MinValue
+            );
+        });
     }
 
     public IEnumerable<PatientStats> ComputePatientStats()
     {
-        foreach (var patient in _patientManager.GetAll())
-        {
-            int count = 0;
-            decimal sum = 0;
-            DateTime lastDate = DateTime.MinValue;
+        var patients = _patientManager.GetAll();
 
-            foreach (var appointment in _appointmentManager.GetAll())
+        return _patientManager.GetAll().Select(p =>
             {
-                if (appointment.PatientId == patient.Id)
-                {
-                    count++;
-                    sum += appointment.GetCost();
-                    if (appointment.ScheduledAt > lastDate)
-                    {
-                        lastDate = appointment.ScheduledAt;
-                    }
-                }
+                var patientApps = _appointmentManager.GetAll().Where(a => a.PatientId == p.Id).ToList();
+
+                return new PatientStats(
+                    p.Id,
+                    p.FullName,
+                    patientApps.Count(),
+                    patientApps.Sum(a => a.GetCost()),
+                    patientApps.Any() ? patientApps.Max(a => a.ScheduledAt) : DateTime.MinValue
+                    
+                );
+
             }
 
-            PatientStats pstat = new(patient.Id, patient.FullName, count,sum, lastDate);
-            yield return pstat;
-        }
+        );
     }
 }
