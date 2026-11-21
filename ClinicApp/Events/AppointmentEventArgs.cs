@@ -13,7 +13,7 @@ public class AppointmentEventArgs : EventArgs
         this.AppointmentId = appointmentId;
         this.PatientId = patientId;
         this.DoctorId = doctorId;
-        this.ScheduledAt = DateTime.Now;
+        this.ScheduledAt = sheduleAt;
         this.Notes = notes;
         
     }
