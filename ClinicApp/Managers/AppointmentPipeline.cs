@@ -7,10 +7,10 @@ internal class AppointmentPipeline
     private readonly AppointmentProcessor  _appointmentProcessor;
     private readonly AppointmentFilter _appointmentFilter;
 
-    public AppointmentPipeline(AppointmentProcessor appointmentProcessor, AppointmentFilter _appointmentFilter)
+    public AppointmentPipeline()
     {
-        this._appointmentProcessor = appointmentProcessor;
-        this._appointmentFilter = _appointmentFilter;
+        this._appointmentProcessor = new AppointmentProcessor();
+        this._appointmentFilter = new AppointmentFilter();
     }
 
     public AppointmentPipeline Filter(Func<Appointment, bool> predicate)
