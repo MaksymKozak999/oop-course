@@ -23,11 +23,11 @@ public static class ClinicValidator
     public static void ValidateDate(DateTime value, string fieldName)
     {
         if (value.Date > DateTime.Today || value.Year < 1900)
-            throw new ArgumentOutOfRangeException(nameof(fieldName), "Дата народження має бути між 1900 роком і сьогоднішнім днем.");
+            throw new ArgumentOutOfRangeException(fieldName, "Дата народження має бути між 1900 роком і сьогоднішнім днем.");
     }
     public static void ValidatePositive(int value, string fieldName)
     {
-        if(value < 0)
-            throw new ArgumentOutOfRangeException(nameof(fieldName), "Тривалість не може бути відємною.");
+        if(value <= 0)
+            throw new ArgumentOutOfRangeException(fieldName, "Тривалість не може бути від'ємною.");
     }
 }

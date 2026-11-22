@@ -13,7 +13,7 @@ internal class Appointment : IPayable, ICancellable,IIdentifiable
     private bool _isPaid = false;
     public int PatientId { get;}
     public int DoctorId { get; }
-    public DateTime ScheduledAt { get; set; }
+    public DateTime ScheduledAt { get; private set; }
     private int _durationMinutes;
     public AppointmentStatus Status {  get; private set; }
     public string Notes {  get; private set; }
@@ -46,9 +46,7 @@ internal class Appointment : IPayable, ICancellable,IIdentifiable
         get
         {
             if (IsCancelled)
-            {
                 return Notes;
-            }
 
             return "";
         }
@@ -64,7 +62,7 @@ internal class Appointment : IPayable, ICancellable,IIdentifiable
         return "Прийом";
     }
 
-    public int GetPriority()
+    public virtual int GetPriority()
     {
         return 3;
     }

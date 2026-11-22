@@ -25,7 +25,7 @@ internal class UrgentAppointment : Appointment
         return base.GetCost() * 1.5m;
     }
 
-    public new int GetPriority()
+    public override int GetPriority()
     {
         return 1;
     }

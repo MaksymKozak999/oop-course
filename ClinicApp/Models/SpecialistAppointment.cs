@@ -25,8 +25,8 @@ sealed class SpecialistAppointment  : Appointment
         return base.GetCost() * 1.3m;
     }
 
-    public new int GetPriority()
+    public override int GetPriority()
     {
-        return 1;
+        return 2;
     }
 }

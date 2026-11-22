@@ -47,7 +47,7 @@ public class Prescription : MedicalRecord
 
     public override string GetRecordType() => "Рецепт";
 
-    public override bool IsActive() => ExpiresAt >= DateTime.Today;
+    public override bool IsActive() => ExpiresAt.Date > DateTime.Today;
     
     public override string ToString()
     {
