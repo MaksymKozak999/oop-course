@@ -3,12 +3,13 @@ using System.Globalization;
 using ClinicApp;
 
 using ClinicApp.Enums;
-using ClinicApp.Managers;
 using ClinicApp.Models;
 using ClinicApp.Utils;
 using ClinicApp.Interfaces;
 using ClinicApp.Comparators;
 using ClinicApp.Events;
+using ClinicApp.Extensions;
+using ClinicApp.Managers;
 
 class Program
 {
@@ -128,6 +129,9 @@ class Program
                 case "11":
                     ReportsMenu(clinic);
                     break;
+                case "12":
+                    FunctionalMenu(clinic);
+                    break;
                 case "0":    
                     Console.Write("Зберегти сесію? (y/n): ");
                     if ((Console.ReadLine() ?? "").Trim().ToLower() == "y")
@@ -169,6 +173,7 @@ class Program
         Console.WriteLine("║" + "  9. Плани лікування - рефлексія, атрибути.".PadRight(46) + "║");
         Console.WriteLine("║" + "  10.Файли ".PadRight(46) + "║");
         Console.WriteLine("║" + "  11. Звіти".PadRight(46) + "║");
+        Console.WriteLine("║" + "  12. Фільтри        - Func, Action, Pipeline".PadRight(46) + "║");
         Console.WriteLine("║" + "  0. Вийти".PadRight(46) + "║");
         Console.WriteLine("╚" + new string('═', 46) + "╝");
         Console.Write("Оберіть розділ: ");
@@ -238,12 +243,135 @@ class Program
             }
         }
     }
+    
+    static void FunctionalMenu(Clinic clinic)
+    {
+        while (true)
+        {
+            Console.WriteLine("\n==== Фільтри ====");
+            Console.WriteLine("1. Неоплачені прийоми і їх загальна сума");
+            Console.WriteLine("2. Майбутні записи дорожчі за N грн");
+            Console.WriteLine("3. Повнолітні пацієнти");
+            Console.WriteLine("4. Лікарі з хоч одним записом");
+            Console.WriteLine("5. Термінові і майбутні");
+            Console.WriteLine("6. Термінові або прострочені");
+            Console.WriteLine("7. Дві дії над кожним записом");
+            Console.WriteLine("8. Повний пайплайн: фільтр -> дія");
+            Console.WriteLine("0. Назад");
+            Console.Write("Оберіть: ");
 
+            string? choice = Console.ReadLine()?.Trim();
+            if (choice == "0") return;
+
+            var appointments = clinic.Appointments.GetAll(); 
+
+            switch (choice)
+            {
+                case "1":
+                {
+                    var unpaid = appointments.Unpaid().ToList();
+                    foreach (var a in unpaid)
+                    {
+                        Console.WriteLine(a);
+                    }
+                    Console.WriteLine($"Загальна сума: {unpaid.TotalCost():F2} грн");
+                    break;
+                }
+                case "2":
+                {
+                    Console.Write("Поріг, грн: ");
+                    if (decimal.TryParse(Console.ReadLine(), out decimal threshold))
+                    {
+                        var result = appointments.Upcoming().CostAbove(threshold);
+                        foreach (var a in result)
+                        {
+                            Console.WriteLine(a);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некоректна сума.");
+                    }
+                    break;
+                }
+                case "3":
+                {
+                    var adults = clinic.Patients.GetAll().Adults(); 
+                    foreach (var p in adults)
+                    {
+                        Console.WriteLine(p);
+                    }
+                    break;
+                }
+                case "4":
+                {
+                    var doctors = clinic.Doctors.GetAll().WithAppointments(appointments); 
+                    foreach (var d in doctors)
+                    {
+                        Console.WriteLine(d);
+                    }
+                    break;
+                }
+                case "5":
+                {
+                    var filter = new AppointmentFilter()
+                        .Add(a => a is UrgentAppointment)
+                        .And(a => a.IsUpcoming); 
+
+                    foreach (var a in filter.Apply(appointments))
+                    {
+                        Console.WriteLine(a);
+                    }
+                    break;
+                }
+                case "6":
+                {
+                    var filter = new AppointmentFilter()
+                        .Add(a => a is UrgentAppointment)
+                        .Or(a => a.IsCancelled);
+
+                    foreach (var a in filter.Apply(appointments))
+                    {
+                        Console.WriteLine(a);
+                    }
+                    break;
+                }
+                case "7":
+                {
+                    var processor = new AppointmentProcessor()
+                        .Combine(
+                            a => Console.WriteLine(a),
+                            a => clinic.Logger.LogInfo($"Переглянуто запис: {a}")
+                        );
+
+                    processor.Execute(appointments);
+                    break;
+                }
+                case "8":
+                {
+                    clinic.Pipeline.Reset();
+
+                    int count = clinic.Pipeline
+                        .Filter(a => !a.IsPaid)
+                        .Filter(a => a.IsUpcoming)
+                        .Then(a => Console.WriteLine(a))
+                        .Execute(appointments);
+
+                    Console.WriteLine($"Оброблено: {count} записів.");
+                    break;
+                }
+                default:
+                    Console.WriteLine("Невідомий пункт меню.");
+                    break;
+            }
+        }
+    }
+    
     private static void TreatmentPlanMenu(Clinic clinic)
     {
         while (true)
         {
-            Console.WriteLine("\n=== Плани лікування ===");
+            Console.WriteLine("\n==== Плани лікування ====");
             Console.WriteLine("1 — Показати всі плани");
             Console.WriteLine("2 — Додати план лікування");
             Console.WriteLine("3 — Плани пацієнта");
@@ -334,7 +462,7 @@ class Program
     {
         while (true)
         {
-            Console.WriteLine("\n=== Звіти ===");
+            Console.WriteLine("\n==== Звіти ====");
             Console.WriteLine("1 — Спеціальності");
             Console.WriteLine("2 — Найзавантаженіший лікар");
             Console.WriteLine("3 — Пацієнти з кількома візитами");
@@ -464,7 +592,7 @@ class Program
     {
         while (true)
         {
-            Console.WriteLine("\n=== Черга пацієнтів ===");
+            Console.WriteLine("\n==== Черга пацієнтів ====");
             Console.WriteLine("1 - Додати пацієнта до черги");
             Console.WriteLine("2 - Прийняти первого");
             Console.WriteLine("3 - Хто перший?");
@@ -552,7 +680,7 @@ class Program
 
         while (!back)
         {
-            Console.WriteLine("\n── Рахунки ──────────────────");
+            Console.WriteLine("\n==== Рахунки ====");
             Console.WriteLine("  1. Борги пацієнта");
             Console.WriteLine("  2. Всі неоплачені записи");
             Console.WriteLine("  3. Оплатити запис");
@@ -645,7 +773,7 @@ class Program
     {
         while (true)
         {
-            Console.WriteLine("\n- Аналітика -");
+            Console.WriteLine("\n==== Аналітика ====");
             Console.WriteLine("1. Лікарі за навантаженням");
             Console.WriteLine("2. Лікарі за виручкою");
             Console.WriteLine("3. Лікарі за іменем");
@@ -707,7 +835,7 @@ class Program
 
         while (!back)
         {
-            Console.WriteLine("\n--- Підменю: Пацієнти ---");
+            Console.WriteLine("\n==== Підменю: Пацієнти ====");
             Console.WriteLine("1. Показати всіх");
             Console.WriteLine("2. Додати пацієнта");
             Console.WriteLine("3. Знайти за ID (TryFindById + out)");
@@ -885,7 +1013,7 @@ class Program
 
         while (!back)
         {
-            Console.WriteLine("\n--- Підменю: Медична картка ---");
+            Console.WriteLine("\n==== Підменю: Медична картка ====");
             Console.WriteLine("1. Картка пацієнта");
             Console.WriteLine("2. Усі записи пацієнта");
             Console.WriteLine("3. Додати діагноз");
@@ -1155,7 +1283,7 @@ class Program
 
         while (!back)
         {
-            Console.WriteLine("\n--- Підменю: Лікарі ---");
+            Console.WriteLine("\n==== Підменю: Лікарі ====");
             Console.WriteLine("1. Показати всіх");
             Console.WriteLine("2. Додати лікаря");
             Console.WriteLine("3. Знайти за ID (TryFindById + out)");
@@ -1380,7 +1508,7 @@ class Program
 
         while (!back)
         {
-            Console.WriteLine("\n--- Підменю: Записи ---");
+            Console.WriteLine("\n==== Підменю: Записи ====");
             Console.WriteLine("1. Показати всі майбутні записи");
             Console.WriteLine("2. Записати пацієнта");
             Console.WriteLine("3. Показати записи пацієнта");

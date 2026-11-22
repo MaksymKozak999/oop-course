@@ -1,7 +1,6 @@
 using ClinicApp.Managers;
 using ClinicApp.Models;
 using ClinicApp.Utils;
-using ClinicApp.Events;
 
 namespace ClinicApp;
 internal class Clinic
@@ -32,6 +31,7 @@ internal class Clinic
     public PatientPassportWriter Passport { get; }
     public SessionEventTracker Tracker { get; }
     public ReportManager Reports { get; }
+    public AppointmentPipeline Pipeline { get; }
     
 
     public Clinic(string name)
@@ -51,6 +51,7 @@ internal class Clinic
         Passport = new PatientPassportWriter(this);
         Tracker = new SessionEventTracker(this);
         Reports = new ReportManager(_appointments, _doctors,_patients);
+        Pipeline = new AppointmentPipeline();
         SubscribeEvents();
         
         
